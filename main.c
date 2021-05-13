@@ -17,9 +17,29 @@ int main()
                 escolha = imprimeGerenciarClientes();
                 if (escolha == 'C')
                 {
-                    /* code */
+                    char nome[100];
+                    printf("Nome: ");
+                    fgets(nome, sizeof(nome), stdin);
+                    //getchar();
+
+                    char CPF_CNPJ[12];
+                    printf("CPF/CNPJ: ");
+                    scanf("%s", &CPF_CNPJ);
+                    getchar();
+
+                    char telefone[14];
+                    printf("Telefone: ");
+                    scanf("%s", &telefone);
+                    getchar();
+
+                    char endereco[100];
+                    printf("Endereço: ");
+                    scanf("%s", endereco);
+                    getchar();
+
+                    cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco); 
                 }
-                
+                if (escolha != 'S') escolha = '0';
             }
         }
         else if (escolha == 'T')
@@ -60,7 +80,12 @@ char imprimeBemVindo()
     char escolha = '0';
     while(escolha != 'C' && escolha != 'T' && escolha != 'S')
     {
-        printf("=============== Bem vindo! =================\nDigite um comando para prosseguir:\nC - Gerenciar Clientes\nT - Gerenciar Contas\nS - Sair\n-> ");
+        printf("=============== Bem vindo! =================\n"
+               "Digite um comando para prosseguir:\n"
+               "C - Gerenciar Clientes\n"
+               "T - Gerenciar Contas\n"
+               "S - Sair\n-> "
+        );
         scanf("%c", &escolha);
         getchar();
         escolha = paraMaiuscula(escolha);
