@@ -9,10 +9,24 @@ CLIENTE cliente[100];
 int main()
 {
     char escolha = imprimeBemVindo();
-    if (escolha == 'C') 
-        escolha = imprimeGerenciarClientes();
-    else if (escolha == 'T')
-        escolha = imprimeGerenciarContas();
+    while (escolha != 'S')
+    {
+        if (escolha == 'C') {
+            while (escolha != 'S')
+            {
+                escolha = imprimeGerenciarClientes();
+                if (escolha == 'C')
+                {
+                    /* code */
+                }
+                
+            }
+        }
+        else if (escolha == 'T')
+            escolha = imprimeGerenciarContas();
+        escolha = imprimeBemVindo();
+    }
+    
 
     cadastraCliente("1234", "Ricardo", "123456789xx", "+5562912341234", "Rua 1, Casa 2, Apt 3");
 }
