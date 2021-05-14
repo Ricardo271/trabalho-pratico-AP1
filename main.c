@@ -15,39 +15,7 @@ int main()
             while (escolha != 'S')
             {
                 escolha = imprimeGerenciarClientes();
-                // char nome[100];
-                // char CPF_CNPJ[12];
-                // char telefone[14];
-                // char endereco[100];
-                // switch(escolha)
-                // {
-                //     case 'C' :
-                //         printf("Nome: ");
-                //         fgets(nome, sizeof(nome), stdin);
-                //         //getchar();
-
-                //         printf("CPF/CNPJ: ");
-                //         scanf("%s", &CPF_CNPJ);
-                //         getchar();
-
-                //         printf("Telefone: ");
-                //         scanf("%s", &telefone);
-                //         getchar();
-
-                //         printf("Endereço: ");
-                //         scanf("%s", &endereco);
-                //         getchar();
-
-                //         int i = 0;
-                //         while (cliente[i].codigo != "") i++;
-                //         cliente[i] = cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco);
-                //         break;
-
-                //     case 'L' :
-                //         listaClientes();
-                //         break;
-                // }
-                if(escolha == 'C')
+                if (escolha == 'C')
                 {
                     char nome[100];
                     printf("Nome: ");
@@ -66,16 +34,10 @@ int main()
 
                     char endereco[100];
                     printf("Endereço: ");
-                    scanf("%s", &endereco);
+                    scanf("%s", endereco);
                     getchar();
 
-                    int i = 0;
-                    while (cliente[i].codigo != "") i++;
-                    cliente[i] = cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco);
-                }
-                else if(escolha == 'L')
-                {
-                    listaClientes();
+                    cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco); 
                 }
                 if (escolha != 'S') escolha = '0';
             }
@@ -97,10 +59,8 @@ CLIENTE cadastraCliente(char codigo[], char nome[], char CPF_CNPJ[], char telefo
     strcpy(C.CPF_CNPJ, CPF_CNPJ);
     strcpy(C.telefone, telefone);
     strcpy(C.endereco, endereco);
-    return C;
 }
 
-// TODO
 int verificaCodigos()
 {
     for (int i = 0; i < 100; i++)
@@ -112,14 +72,6 @@ int verificaCodigos()
                 return 0;
             }
         }
-    }
-}
-
-void listaClientes()
-{
-    foreach(CLIENTE *c, cliente)
-    {
-        printf("Nome: %s\n", *c->nome);
     }
 }
 
