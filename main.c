@@ -35,11 +35,10 @@ int main()
                     char endereco[100];
                     printf("Endereço: ");
                     scanf("%s", endereco);
-                    //getchar();
+                    getchar();
 
-                    //O problema está nessa parte
                     int i = 0;
-                    while (cliente[i].nome != "") i++;
+                    while (cliente[i].nome[0] != 0)i++;
                     cliente[i] = cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco); 
                 }
                 if (escolha != 'S') escolha = '0';
