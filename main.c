@@ -7,9 +7,15 @@
 #define SIZE 100
 
 CLIENTE cliente[SIZE];
+int clientes_registrados = 0;
+
+//TODO: colocar esse protótipo em algum dos arquivos .h
+void carregaClientes();
 
 int main()
 {
+    carregaClientes();    
+
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
     {
@@ -43,6 +49,20 @@ int main()
                 } else if (escolha == 'L')
                 {
                     listaClientes(cliente);
+                } else if (escolha == 'B')
+                {
+                    escolha = imprimeMenuBusca();
+                    // printf("Insira Nome, Codigo ou CPF/CNPJ do cliente:\n-> ");
+                    printf("Insira o Termo de busca: ");
+                    char string[100];
+                    //fgets(string, sizeof(string), stdin);
+                    scanf("%s", &string);
+                    getchar();
+                    int aux = buscaClientes(cliente, escolha, string);
+                    if (aux == -1)
+                        printf("Nenhum cliente foi encontrado.\n");
+                    else
+                        imprimeCliente(cliente[aux]);
                 }
 
                 // Reseta a escolha
@@ -59,11 +79,14 @@ int main()
 CLIENTE cadastraCliente(char codigo[], char nome[], char CPF_CNPJ[], char telefone[], char endereco[])
 {
     CLIENTE C;
+
     strcpy(C.codigo, codigo);
     strcpy(C.nome, nome);
     strcpy(C.CPF_CNPJ, CPF_CNPJ);
     strcpy(C.telefone, telefone);
     strcpy(C.endereco, endereco);
+
+    clientes_registrados++;
     return C;
 }
 
@@ -106,6 +129,33 @@ void listaClientes(CLIENTE C[])
         i++;
     }
     
+}
+
+int buscaClientes(CLIENTE C[], char opcao, char string[])
+{
+    for (int i = 0; i < clientes_registrados; i++)
+    {
+        switch (opcao)
+        {
+            case 'N' :
+                if (strstr(cliente[i].nome, string) != NULL)
+                    return i;           
+            break;
+        }
+    }
+    return -1;
+}
+
+void imprimeCliente(CLIENTE C)
+{
+    printf("----------------------\n"
+            "Nome: %s"
+            "CPF/CNPJ: %s"
+            "Codigo: %s\n"
+            "Telefone: %s"
+            "Endereço: %s"
+            "---------------------\n",
+            C.nome, C.CPF_CNPJ, C.codigo, C.telefone, C.endereco);
 }
 
 char imprimeBemVindo()
@@ -169,7 +219,27 @@ char imprimeGerenciarContas()
         scanf("%c", &escolha);
         getchar();
         escolha = paraMaiuscula(escolha);
-        if (escolha != 'C' && escolha != 'T' && escolha != 'S')
+        if (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
+            printf("\nPor favor escolha uma das opções\n\n");
+    }
+    return escolha;
+}
+
+char imprimeMenuBusca()
+{
+    char escolha = '0';
+    while (escolha != 'N' && escolha != 'C' && escolha != 'D')
+    {
+        printf("==================================================\n"
+               "Deseja realizar a busca por:\n"
+               "N – Nome\n"
+               "C – Codigo\n"
+               "D - CPF/CNPJ\n"
+               "-> ");
+        scanf("%c", &escolha);
+        getchar();
+        escolha = paraMaiuscula(escolha);
+        if (escolha != 'N' && escolha != 'C' && escolha != 'D')
             printf("\nPor favor escolha uma das opções\n\n");
     }
     return escolha;
@@ -180,4 +250,15 @@ char paraMaiuscula(char c)
     if (c >= 97 && c <= 122)
         c -= 32;
     return c;
+}
+
+//TODO:
+void carregaClientes()
+{
+    int i = 0;
+    while (cliente[i].nome[0] != 0)
+    {
+        i++;
+    }
+    clientes_registrados = i;
 }

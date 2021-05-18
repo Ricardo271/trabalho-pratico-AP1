@@ -9,6 +9,10 @@ typedef struct _CLIENTE
 
 CLIENTE cadastraCliente(char codigo[], char nome[], char CPF_CNPJ[], char telefone[], char endereco[]);
 
+void organizaClientes(CLIENTE C[]);
+
 void listaClientes(CLIENTE C[]);
 
-void organizaClientes(CLIENTE C[]);
+int buscaClientes(CLIENTE C[], char opcao, char string[]);
+
+void imprimeCliente();
