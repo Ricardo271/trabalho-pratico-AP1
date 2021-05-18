@@ -4,14 +4,17 @@
 #include "clientes.h"
 #include "menus.h"
 
-CLIENTE cliente[100];
+#define SIZE 100
+
+CLIENTE cliente[SIZE];
 
 int main()
 {
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
     {
-        if (escolha == 'C') {
+        if (escolha == 'C')
+        {
             while (escolha != 'S')
             {
                 escolha = imprimeGerenciarClientes();
@@ -20,47 +23,48 @@ int main()
                     char nome[100];
                     printf("Nome: ");
                     fgets(nome, sizeof(nome), stdin);
-                    //getchar();
 
-                    char CPF_CNPJ[12];
+                    char CPF_CNPJ[20];
                     printf("CPF/CNPJ: ");
-                    scanf("%s", &CPF_CNPJ);
-                    getchar();
+                    fgets(CPF_CNPJ, sizeof(CPF_CNPJ), stdin);
 
-                    char telefone[14];
+                    char telefone[20];
                     printf("Telefone: ");
-                    scanf("%s", &telefone);
-                    getchar();
+                    fgets(telefone, sizeof(telefone), stdin);
 
                     char endereco[100];
                     printf("Endereço: ");
-                    scanf("%s", endereco);
-                    getchar();
+                    fgets(endereco, sizeof(endereco), stdin);
 
                     int i = 0;
-                    while (cliente[i].nome[0] != 0)i++;
-                    cliente[i] = cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco); 
+                    while (cliente[i].nome[0] != 0)
+                        i++;
+                    cliente[i] = cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco);
+                } else if (escolha == 'L')
+                {
+                    listaClientes(cliente);
                 }
-                if (escolha != 'S') escolha = '0';
+
+                // Reseta a escolha
+                if (escolha != 'S')
+                    escolha = '0';
             }
         }
         else if (escolha == 'T')
             escolha = imprimeGerenciarContas();
         escolha = imprimeBemVindo();
     }
-    
-
-    cadastraCliente("1234", "Ricardo", "123456789xx", "+5562912341234", "Rua 1, Casa 2, Apt 3");
 }
 
 CLIENTE cadastraCliente(char codigo[], char nome[], char CPF_CNPJ[], char telefone[], char endereco[])
 {
     CLIENTE C;
-    strcpy(C.codigo,codigo);
+    strcpy(C.codigo, codigo);
     strcpy(C.nome, nome);
     strcpy(C.CPF_CNPJ, CPF_CNPJ);
     strcpy(C.telefone, telefone);
     strcpy(C.endereco, endereco);
+    return C;
 }
 
 int verificaCodigos()
@@ -77,21 +81,48 @@ int verificaCodigos()
     }
 }
 
+// !TODO
+void organizaClientes(CLIENTE C[])
+{
+    return;
+}
+
+void listaClientes(CLIENTE C[])
+{
+    //organizaClientes(cliente);
+    int i = 0;
+    while (C[i].nome[0] != 0)
+    {
+        // Valores obtidos com o fgets() ficam com o ENTER final
+        printf("----- CLIENTE %d -----\n"
+                "Nome: %s"
+                "CPF/CNPJ: %s"
+                "Codigo: %s\n"
+                "Telefone: %s"
+                "Endereço: %s"
+                "---------------------\n",
+                i, C[i].nome, C[i].CPF_CNPJ, C[i].codigo, C[i].telefone, C[i].endereco);
+
+        i++;
+    }
+    
+}
+
 char imprimeBemVindo()
 {
     char escolha = '0';
-    while(escolha != 'C' && escolha != 'T' && escolha != 'S')
+    while (escolha != 'C' && escolha != 'T' && escolha != 'S')
     {
         printf("=============== Bem vindo! =================\n"
                "Digite um comando para prosseguir:\n"
                "C - Gerenciar Clientes\n"
                "T - Gerenciar Contas\n"
-               "S - Sair\n-> "
-        );
+               "S - Sair\n-> ");
         scanf("%c", &escolha);
         getchar();
         escolha = paraMaiuscula(escolha);
-        if (escolha != 'C' && escolha != 'T' && escolha != 'S') printf("\nPor favor escolha uma das opções\n\n");
+        if (escolha != 'C' && escolha != 'T' && escolha != 'S')
+            printf("\nPor favor escolha uma das opções\n\n");
     }
     return escolha;
 }
@@ -99,7 +130,7 @@ char imprimeBemVindo()
 char imprimeGerenciarClientes()
 {
     char escolha = '0';
-    while(escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
+    while (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
     {
         printf("=============== Gerenciar Clientes =================\n"
                "Digite um comando para prosseguir:\n"
@@ -109,12 +140,12 @@ char imprimeGerenciarClientes()
                "A - Atualizar um cliente cadastrado\n"
                "E - Excluir um cliente cadastrado\n"
                "S - Sair\n"
-               "-> "
-        );
+               "-> ");
         scanf("%c", &escolha);
         getchar();
         escolha = paraMaiuscula(escolha);
-        if (escolha != 'C' && escolha != 'T' && escolha != 'S') printf("\nPor favor escolha uma das opções\n\n");
+        if (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
+            printf("\nPor favor escolha uma das opções\n\n");
     }
     return escolha;
 }
@@ -122,7 +153,7 @@ char imprimeGerenciarClientes()
 char imprimeGerenciarContas()
 {
     char escolha = '0';
-    while(escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
+    while (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
     {
         printf("=============== Gerenciar Contas =================\n"
                "Digite um comando para prosseguir:\n"
@@ -134,18 +165,19 @@ char imprimeGerenciarContas()
                "T – Realizar transferência entre contas\n"
                "E – Exibir extrato de uma conta\n"
                "S - Sair\n"
-               "-> "
-        );
+               "-> ");
         scanf("%c", &escolha);
         getchar();
         escolha = paraMaiuscula(escolha);
-        if (escolha != 'C' && escolha != 'T' && escolha != 'S') printf("\nPor favor escolha uma das opções\n\n");
+        if (escolha != 'C' && escolha != 'T' && escolha != 'S')
+            printf("\nPor favor escolha uma das opções\n\n");
     }
     return escolha;
 }
 
 char paraMaiuscula(char c)
 {
-    if (c >= 97 && c <= 122) c -= 32;
+    if (c >= 97 && c <= 122)
+        c -= 32;
     return c;
 }
