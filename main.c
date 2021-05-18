@@ -63,6 +63,10 @@ int main()
                         printf("Nenhum cliente foi encontrado.\n");
                     else
                         imprimeCliente(cliente[aux]);
+                } else if (escolha == 'A')
+                {
+                    escolha = imprimeMenuAtualizacao();
+
                 }
 
                 // Reseta a escolha
@@ -90,6 +94,7 @@ CLIENTE cadastraCliente(char codigo[], char nome[], char CPF_CNPJ[], char telefo
     return C;
 }
 
+// TODO!: 
 int verificaCodigos()
 {
     for (int i = 0; i < 100; i++)
@@ -141,9 +146,24 @@ int buscaClientes(CLIENTE C[], char opcao, char string[])
                 if (strstr(cliente[i].nome, string) != NULL)
                     return i;           
             break;
+
+            case 'C' :
+                if (strstr(cliente[i].codigo, string) != NULL)
+                    return i;
+            break;
+
+            case 'D' :
+                if (strstr(cliente[i].CPF_CNPJ, string) != NULL)
+                    return i;
+            break;
         }
     }
     return -1;
+}
+
+CLIENTE atualizaCliente(CLIENTE C)
+{
+    
 }
 
 void imprimeCliente(CLIENTE C)
@@ -243,6 +263,26 @@ char imprimeMenuBusca()
             printf("\nPor favor escolha uma das opções\n\n");
     }
     return escolha;
+}
+
+char imprimeMenuAtualizacao()
+{
+    char escolha = '0';
+    while (escolha != 'C' && escolha != 'D')
+    {
+        printf("==================================================\n"
+               "Codigo ou CPF/CNPJ :\n"
+               "C – Codigo\n"
+               "D - CPF/CNPJ\n"
+               "-> ");
+        scanf("%c", &escolha);
+        getchar();
+        escolha = paraMaiuscula(escolha);
+        if (escolha != 'C' && escolha != 'D')
+            printf("\nPor favor escolha uma das opções\n\n");
+    }
+    return escolha;
+
 }
 
 char paraMaiuscula(char c)

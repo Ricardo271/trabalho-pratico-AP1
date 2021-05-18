@@ -15,4 +15,6 @@ void listaClientes(CLIENTE C[]);
 
 int buscaClientes(CLIENTE C[], char opcao, char string[]);
 
+CLIENTE atualizaCliente(CLIENTE C);
+
 void imprimeCliente();
