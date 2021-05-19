@@ -60,13 +60,16 @@ int main()
                     getchar();
                     int aux = buscaClientes(cliente, escolha, string);
                     if (aux == -1)
-                        printf("Nenhum cliente foi encontrado.\n");
+                        printf("\nNenhum cliente foi encontrado.\n\n");
                     else
                         imprimeCliente(cliente[aux]);
                 } else if (escolha == 'A')
                 {
                     escolha = imprimeMenuAtualizacao();
-
+                    char string[15];
+                    scanf("%s", &string);
+                    getchar();
+                    atualizaCliente(buscaClientes(cliente, escolha, string));
                 }
 
                 // Reseta a escolha
@@ -161,9 +164,20 @@ int buscaClientes(CLIENTE C[], char opcao, char string[])
     return -1;
 }
 
-CLIENTE atualizaCliente(CLIENTE C)
+int atualizaCliente(int indice)
 {
-    
+    char escolha = '0';
+    printf("São esses o nome e CPF/CNPJ do cliente que vc deseja atualizar?(S/N)\n"
+            " - %s\n"
+            " - %s\n", cliente[indice].nome, cliente[indice].CPF_CNPJ);
+    switch (escolha)
+    {
+        case 'N' :
+            return -1;
+        case 'S' :
+            cliente[indice] = cadastraCliente();
+    }
+
 }
 
 void imprimeCliente(CLIENTE C)
@@ -271,7 +285,7 @@ char imprimeMenuAtualizacao()
     while (escolha != 'C' && escolha != 'D')
     {
         printf("==================================================\n"
-               "Codigo ou CPF/CNPJ :\n"
+               "Deseja buscar o cliente por Codigo ou CPF/CNPJ :\n"
                "C – Codigo\n"
                "D - CPF/CNPJ\n"
                "-> ");
@@ -281,8 +295,11 @@ char imprimeMenuAtualizacao()
         if (escolha != 'C' && escolha != 'D')
             printf("\nPor favor escolha uma das opções\n\n");
     }
+    if (escolha == 'C')
+        printf("Insira o codigo: ");
+    else if (escolha == 'D')
+        printf("Insira o CPF/CNPJ: ");
     return escolha;
-
 }
 
 char paraMaiuscula(char c)
