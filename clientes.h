@@ -7,7 +7,7 @@ typedef struct _CLIENTE
     char endereco[100];
 } CLIENTE;
 
-CLIENTE cadastraCliente(char codigo[], char nome[], char CPF_CNPJ[], char telefone[], char endereco[]);
+CLIENTE cadastraCliente();
 
 void organizaClientes(CLIENTE C[]);
 

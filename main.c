@@ -26,26 +26,7 @@ int main()
                 escolha = imprimeGerenciarClientes();
                 if (escolha == 'C')
                 {
-                    char nome[100];
-                    printf("Nome: ");
-                    fgets(nome, sizeof(nome), stdin);
-
-                    char CPF_CNPJ[20];
-                    printf("CPF/CNPJ: ");
-                    fgets(CPF_CNPJ, sizeof(CPF_CNPJ), stdin);
-
-                    char telefone[20];
-                    printf("Telefone: ");
-                    fgets(telefone, sizeof(telefone), stdin);
-
-                    char endereco[100];
-                    printf("Endereço: ");
-                    fgets(endereco, sizeof(endereco), stdin);
-
-                    int i = 0;
-                    while (cliente[i].nome[0] != 0)
-                        i++;
-                    cliente[i] = cadastraCliente("1234", nome, CPF_CNPJ, telefone, endereco);
+                    cliente[clientes_registrados] = cadastraCliente();
                 } else if (escolha == 'L')
                 {
                     listaClientes(cliente);
@@ -83,8 +64,26 @@ int main()
     }
 }
 
-CLIENTE cadastraCliente(char codigo[], char nome[], char CPF_CNPJ[], char telefone[], char endereco[])
+CLIENTE cadastraCliente()
 {
+    char codigo[15] = "1234";
+
+    char nome[100];
+    printf("Nome: ");
+    fgets(nome, sizeof(nome), stdin);
+
+    char CPF_CNPJ[20];
+    printf("CPF/CNPJ: ");
+    fgets(CPF_CNPJ, sizeof(CPF_CNPJ), stdin);
+
+    char telefone[20];
+    printf("Telefone: ");
+    fgets(telefone, sizeof(telefone), stdin);
+
+    char endereco[100];
+    printf("Endereço: ");
+    fgets(endereco, sizeof(endereco), stdin);
+
     CLIENTE C;
 
     strcpy(C.codigo, codigo);
@@ -166,18 +165,7 @@ int buscaClientes(CLIENTE C[], char opcao, char string[])
 
 int atualizaCliente(int indice)
 {
-    char escolha = '0';
-    printf("São esses o nome e CPF/CNPJ do cliente que vc deseja atualizar?(S/N)\n"
-            " - %s\n"
-            " - %s\n", cliente[indice].nome, cliente[indice].CPF_CNPJ);
-    switch (escolha)
-    {
-        case 'N' :
-            return -1;
-        case 'S' :
-            cliente[indice] = cadastraCliente();
-    }
-
+    
 }
 
 void imprimeCliente(CLIENTE C)
