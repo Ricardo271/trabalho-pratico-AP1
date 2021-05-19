@@ -27,6 +27,7 @@ int main()
                 if (escolha == 'C')
                 {
                     cliente[clientes_registrados] = cadastraCliente();
+                    clientes_registrados++;
                 } else if (escolha == 'L')
                 {
                     listaClientes(cliente);
@@ -50,7 +51,13 @@ int main()
                     char string[15];
                     scanf("%s", &string);
                     getchar();
-                    atualizaCliente(buscaClientes(cliente, escolha, string));
+                    int aux = atualizaCliente(buscaClientes(cliente, escolha, string));
+                    if (aux == 1)
+                        printf("O cliente foi atualizado com sucesso\n");
+                    else if (aux == 0)
+                        printf("A atualização foi cancelada\n");
+                    else if (aux == -1)
+                        printf("Ocorreu um erro durante a atualização do cliente\n");
                 }
 
                 // Reseta a escolha
@@ -92,7 +99,6 @@ CLIENTE cadastraCliente()
     strcpy(C.telefone, telefone);
     strcpy(C.endereco, endereco);
 
-    clientes_registrados++;
     return C;
 }
 
@@ -165,7 +171,28 @@ int buscaClientes(CLIENTE C[], char opcao, char string[])
 
 int atualizaCliente(int indice)
 {
-    
+    char escolha = '0';
+    printf("São esses o nome e CPF/CNPJ do cliente que vc deseja atualizar?(S/N)\n"
+            " - %s"
+            " - %s", cliente[indice].nome, cliente[indice].CPF_CNPJ);
+    while (escolha != 'N' && escolha != 'S')
+    {
+        scanf("%c", &escolha);
+        getchar();
+        paraMaiuscula(escolha);
+        switch (escolha)
+        {
+            case 'N' :
+                return 0;
+                break;
+            case 'S' :
+                cliente[indice] = cadastraCliente();
+                return 1;
+                break;
+        } 
+    }
+    //TODO: lembrar de colocar alguma verificação se o cliente realmente foi cadastrado
+    return -1;
 }
 
 void imprimeCliente(CLIENTE C)
