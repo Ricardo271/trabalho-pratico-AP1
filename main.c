@@ -14,7 +14,7 @@ void carregaClientes();
 
 int main()
 {
-    carregaClientes();    
+    carregaClientes();
 
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
@@ -28,10 +28,12 @@ int main()
                 {
                     cliente[clientes_registrados] = cadastraCliente();
                     clientes_registrados++;
-                } else if (escolha == 'L')
+                }
+                else if (escolha == 'L')
                 {
                     listaClientes(cliente);
-                } else if (escolha == 'B')
+                }
+                else if (escolha == 'B')
                 {
                     escolha = imprimeMenuBusca();
                     // printf("Insira Nome, Codigo ou CPF/CNPJ do cliente:\n-> ");
@@ -45,9 +47,10 @@ int main()
                         printf("\nNenhum cliente foi encontrado.\n\n");
                     else
                         imprimeCliente(cliente[aux]);
-                } else if (escolha == 'A')
+                }
+                else if (escolha == 'A')
                 {
-                    escolha = imprimeMenuAtualizacao();
+                    escolha = imprimeMenuAtualizacao_Exclusao();
                     char string[15];
                     scanf("%s", &string);
                     getchar();
@@ -57,7 +60,24 @@ int main()
                     else if (aux == 0)
                         printf("A atualização foi cancelada\n");
                     else if (aux == -1)
+                        printf("Cliente não encontrado\n");
+                    else if (aux == -2)
                         printf("Ocorreu um erro durante a atualização do cliente\n");
+                }
+                else if (escolha == 'E')
+                {
+                    escolha = imprimeMenuAtualizacao_Exclusao();
+                    char string[15];
+                    scanf("%s", &string);
+                    getchar();
+                    int aux = excluiCliente(buscaClientes(cliente, escolha, string));
+                    if (aux == 0)
+                        printf("A operação de exculsão foi cancelada\n");
+                    else if (aux == 1) 
+                    {
+                        printf("Ocliente foi excluído\n");
+                        clientes_registrados--;
+                    }
                 }
 
                 // Reseta a escolha
@@ -102,7 +122,7 @@ CLIENTE cadastraCliente()
     return C;
 }
 
-// TODO!: 
+// TODO!:
 int verificaCodigos()
 {
     for (int i = 0; i < 100; i++)
@@ -131,17 +151,16 @@ void listaClientes(CLIENTE C[])
     {
         // Valores obtidos com o fgets() ficam com o ENTER final
         printf("----- CLIENTE %d -----\n"
-                "Nome: %s"
-                "CPF/CNPJ: %s"
-                "Codigo: %s\n"
-                "Telefone: %s"
-                "Endereço: %s"
-                "---------------------\n",
-                i, C[i].nome, C[i].CPF_CNPJ, C[i].codigo, C[i].telefone, C[i].endereco);
+               "Nome: %s"
+               "CPF/CNPJ: %s"
+               "Codigo: %s\n"
+               "Telefone: %s"
+               "Endereço: %s"
+               "---------------------\n",
+               i, C[i].nome, C[i].CPF_CNPJ, C[i].codigo, C[i].telefone, C[i].endereco);
 
         i++;
     }
-    
 }
 
 int buscaClientes(CLIENTE C[], char opcao, char string[])
@@ -150,19 +169,19 @@ int buscaClientes(CLIENTE C[], char opcao, char string[])
     {
         switch (opcao)
         {
-            case 'N' :
-                if (strstr(cliente[i].nome, string) != NULL)
-                    return i;           
+        case 'N':
+            if (strstr(cliente[i].nome, string) != NULL)
+                return i;
             break;
 
-            case 'C' :
-                if (strstr(cliente[i].codigo, string) != NULL)
-                    return i;
+        case 'C':
+            if (strstr(cliente[i].codigo, string) != NULL)
+                return i;
             break;
 
-            case 'D' :
-                if (strstr(cliente[i].CPF_CNPJ, string) != NULL)
-                    return i;
+        case 'D':
+            if (strstr(cliente[i].CPF_CNPJ, string) != NULL)
+                return i;
             break;
         }
     }
@@ -171,40 +190,63 @@ int buscaClientes(CLIENTE C[], char opcao, char string[])
 
 int atualizaCliente(int indice)
 {
+    if (indice == -1)
+        return -1;
     char escolha = '0';
     printf("São esses o nome e CPF/CNPJ do cliente que vc deseja atualizar?(S/N)\n"
-            " - %s"
-            " - %s", cliente[indice].nome, cliente[indice].CPF_CNPJ);
+           " - %s"
+           " - %s",
+           cliente[indice].nome, cliente[indice].CPF_CNPJ);
     while (escolha != 'N' && escolha != 'S')
     {
         scanf("%c", &escolha);
         getchar();
-        paraMaiuscula(escolha);
+        escolha = paraMaiuscula(escolha);
         switch (escolha)
         {
-            case 'N' :
-                return 0;
-                break;
-            case 'S' :
-                cliente[indice] = cadastraCliente();
-                return 1;
-                break;
-        } 
+        case 'N':
+            return 0;
+            break;
+        case 'S':
+            cliente[indice] = cadastraCliente();
+            return 1;
+            break;
+        }
     }
     //TODO: lembrar de colocar alguma verificação se o cliente realmente foi cadastrado
-    return -1;
+    return -2;
+}
+
+int excluiCliente(int indice)
+{
+    char escolha = '0';
+    printf("Esse é o cliente a ser excluído?(S/N)\n");
+    imprimeCliente(cliente[indice]);
+    while (escolha != 'N' && escolha != 'S')
+    {
+        scanf("%c", &escolha);
+        getchar();
+        escolha = paraMaiuscula(escolha);
+        if (escolha == 'N')
+            return 0;
+    }
+    for (int i = indice; i < clientes_registrados; i++)
+    {
+        cliente[i] = cliente[i+1];
+    }
+    return 1;
 }
 
 void imprimeCliente(CLIENTE C)
 {
     printf("----------------------\n"
-            "Nome: %s"
-            "CPF/CNPJ: %s"
-            "Codigo: %s\n"
-            "Telefone: %s"
-            "Endereço: %s"
-            "---------------------\n",
-            C.nome, C.CPF_CNPJ, C.codigo, C.telefone, C.endereco);
+           "Nome: %s"
+           "CPF/CNPJ: %s"
+           "Codigo: %s\n"
+           "Telefone: %s"
+           "Endereço: %s"
+           "---------------------\n",
+           C.nome, C.CPF_CNPJ, C.codigo, C.telefone, C.endereco);
 }
 
 char imprimeBemVindo()
@@ -294,7 +336,7 @@ char imprimeMenuBusca()
     return escolha;
 }
 
-char imprimeMenuAtualizacao()
+char imprimeMenuAtualizacao_Exclusao()
 {
     char escolha = '0';
     while (escolha != 'C' && escolha != 'D')

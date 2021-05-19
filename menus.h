@@ -6,6 +6,6 @@ char imprimeGerenciarContas();
 
 char imprimeMenuBusca();
 
-char imprimeMenuAtualizacao();
+char imprimeMenuAtualizacao_Exclusao();
 
 char paraMaiuscula(char c);
