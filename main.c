@@ -88,6 +88,10 @@ int main()
             while (escolha != 'S')
             {
                 escolha = imprimeGerenciarContas();
+                if (escolha == 'L')
+                {
+
+                }
             }
         }
         escolha = imprimeBemVindo();
@@ -317,32 +321,6 @@ char imprimeGerenciarClientes()
     return escolha;
 }
 
-// Imprime o Menu "Gerenciar Contas"
-// Retorna o char relativo a alguma das opções do Menu
-char imprimeGerenciarContas()
-{
-    char escolha = '0';
-    while (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
-    {
-        printf("=============== Gerenciar Contas =================\n"
-               "Digite um comando para prosseguir:\n"
-               "R – Listagem de todas as contas cadastradas\n"
-               "C – Cadastrar uma conta para um cliente\n"
-               "L – Listar todas as contas de um cliente\n"
-               "W – Realizar um saque em uma conta\n"
-               "D – Realizar um depósito em uma conta\n"
-               "T – Realizar transferência entre contas\n"
-               "E – Exibir extrato de uma conta\n"
-               "S - Sair\n"
-               "-> ");
-        scanf("%c", &escolha);
-        getchar();
-        escolha = paraMaiuscula(escolha);
-        if (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
-            printf("\nPor favor escolha uma das opções\n\n");
-    }
-    return escolha;
-}
 
 // Imprime o Menu "Busca"
 // Retorna o char relativo a alguma das opções do Menu
@@ -388,6 +366,33 @@ char imprimeMenuAtualizacao_Exclusao()
         printf("Insira o codigo: ");
     else if (escolha == 'D')
         printf("Insira o CPF/CNPJ: ");
+    return escolha;
+}
+
+// Imprime o Menu "Gerenciar Contas"
+// Retorna o char relativo a alguma das opções do Menu
+char imprimeGerenciarContas()
+{
+    char escolha = '0';
+    while (escolha != 'R' && escolha != 'C' && escolha != 'L' && escolha != 'W' && escolha != 'D' && escolha != 'T' && escolha != 'E' && escolha != 'S')
+    {
+        printf("=============== Gerenciar Contas =================\n"
+               "Digite um comando para prosseguir:\n"
+               "R – Listagem de todas as contas cadastradas\n"
+               "C – Cadastrar uma conta para um cliente\n"
+               "L – Listar todas as contas de um cliente\n"
+               "W – Realizar um saque em uma conta\n"
+               "D – Realizar um depósito em uma conta\n"
+               "T – Realizar transferência entre contas\n"
+               "E – Exibir extrato de uma conta\n"
+               "S - Sair\n"
+               "-> ");
+        scanf("%c", &escolha);
+        getchar();
+        escolha = paraMaiuscula(escolha);
+        if (escolha != 'R' && escolha != 'C' && escolha != 'L' && escolha != 'W' && escolha != 'D' && escolha != 'T' && escolha != 'E' && escolha != 'S')
+            printf("\nPor favor escolha uma das opções\n\n");
+    }
     return escolha;
 }
 
