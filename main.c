@@ -31,18 +31,16 @@ int main()
                 }
                 else if (escolha == 'L')
                 {
-                    listaClientes(cliente);
+                    listaClientes();
                 }
                 else if (escolha == 'B')
                 {
                     escolha = imprimeMenuBusca();
-                    // printf("Insira Nome, Codigo ou CPF/CNPJ do cliente:\n-> ");
                     printf("Insira o Termo de busca: ");
                     char string[100];
-                    //fgets(string, sizeof(string), stdin);
                     scanf("%s", &string);
                     getchar();
-                    int aux = buscaClientes(cliente, escolha, string);
+                    int aux = buscaClientes(escolha, string);
                     if (aux == -1)
                         printf("\nNenhum cliente foi encontrado.\n\n");
                     else
@@ -54,7 +52,7 @@ int main()
                     char string[15];
                     scanf("%s", &string);
                     getchar();
-                    int aux = atualizaCliente(buscaClientes(cliente, escolha, string));
+                    int aux = atualizaCliente(buscaClientes(escolha, string));
                     if (aux == 1)
                         printf("O cliente foi atualizado com sucesso\n");
                     else if (aux == 0)
@@ -70,12 +68,12 @@ int main()
                     char string[15];
                     scanf("%s", &string);
                     getchar();
-                    int aux = excluiCliente(buscaClientes(cliente, escolha, string));
+                    int aux = excluiCliente(buscaClientes(escolha, string));
                     if (aux == 0)
                         printf("A operação de exculsão foi cancelada\n");
                     else if (aux == 1) 
                     {
-                        printf("Ocliente foi excluído\n");
+                        printf("O cliente foi excluído\n");
                         clientes_registrados--;
                     }
                 }
@@ -86,11 +84,17 @@ int main()
             }
         }
         else if (escolha == 'T')
-            escolha = imprimeGerenciarContas();
+        {
+            while (escolha != 'S')
+            {
+                escolha = imprimeGerenciarContas();
+            }
+        }
         escolha = imprimeBemVindo();
     }
 }
 
+// Essa função pede os dados do cliente cria um CLIENTE com esses dados e retorna esse cliente
 CLIENTE cadastraCliente()
 {
     char codigo[15] = "1234";
@@ -143,11 +147,12 @@ void organizaClientes(CLIENTE C[])
     return;
 }
 
-void listaClientes(CLIENTE C[])
+// Essa função lista todos os clientes cadastrados
+void listaClientes()
 {
+    // TODO
     //organizaClientes(cliente);
-    int i = 0;
-    while (C[i].nome[0] != 0)
+    for (int i = 0; i < clientes_registrados; i++)
     {
         // Valores obtidos com o fgets() ficam com o ENTER final
         printf("----- CLIENTE %d -----\n"
@@ -157,13 +162,14 @@ void listaClientes(CLIENTE C[])
                "Telefone: %s"
                "Endereço: %s"
                "---------------------\n",
-               i, C[i].nome, C[i].CPF_CNPJ, C[i].codigo, C[i].telefone, C[i].endereco);
-
-        i++;
+               i + 1, cliente[i].nome, cliente[i].CPF_CNPJ, cliente[i].codigo, cliente[i].telefone, cliente[i].endereco);
     }
 }
 
-int buscaClientes(CLIENTE C[], char opcao, char string[])
+// Essa função recebe um char, que define em qual variável do cliente vai ocorrer a busca, e uma string, que é o que vai ser buscado
+// Se a string recebida for encontrada em algum dos clientes do array, o ídice desse cliente é retornado
+// Se a string não for necontrada em nenhum cliente -1 é retornado
+int buscaClientes(char opcao, char string[])
 {
     for (int i = 0; i < clientes_registrados; i++)
     {
@@ -188,9 +194,15 @@ int buscaClientes(CLIENTE C[], char opcao, char string[])
     return -1;
 }
 
+// Essa função recebe o índice do cliente que deve ser atualizado
+// Ela pede uma confirmação para a atualização do cliente
+// Ela chama a cadastraCliente para retornar um novo cliente que substitui o cliente do índice recebido
+// Se o índice recebido for inválido ela retrona -1
+// Se o pedido de confirmação for negado ela retorna 0
+// Se o cliente for atualizado ela retorna 1
 int atualizaCliente(int indice)
 {
-    if (indice == -1)
+    if (indice < 0 || indice >= clientes_registrados)
         return -1;
     char escolha = '0';
     printf("São esses o nome e CPF/CNPJ do cliente que vc deseja atualizar?(S/N)\n"
@@ -214,15 +226,21 @@ int atualizaCliente(int indice)
         }
     }
     //TODO: lembrar de colocar alguma verificação se o cliente realmente foi cadastrado
-    return -2;
 }
 
+// Essa função recebe o índice do cliente que deve ser excluído
+// Ela pede uma confirmação para a exclusão do cliente
+// Ela remove aquele cliente do array passando todos os clientes que estão em posições depois dele para uma posição anterior
+// e remove o último cliente do array
+// Se o pedido de confirmação for negado ela retorna 0
+// Se o cliente for excluído ela retorna 1
+// É importante lembrar de reduzir em 1 a var clientes_registrados após o uso dessa função
 int excluiCliente(int indice)
 {
     char escolha = '0';
     printf("Esse é o cliente a ser excluído?(S/N)\n");
     imprimeCliente(cliente[indice]);
-    while (escolha != 'N' && escolha != 'S')
+    while (escolha != 'S')
     {
         scanf("%c", &escolha);
         getchar();
@@ -234,9 +252,14 @@ int excluiCliente(int indice)
     {
         cliente[i] = cliente[i+1];
     }
+    // - Essa parte não é necessária pois o número de clientes registrados deve ser redizido logo após o uso dessa função
+    // Para remover o último cliente do array, um cliente vazio auxiliar é criado e o ultimo cliente recebe o valor dele
+    //CLIENTE aux; 
+    //cliente[clientes_registrados - 1] = aux;
     return 1;
 }
 
+// Essa função recebe um cliente e imprime os dados desse cliente
 void imprimeCliente(CLIENTE C)
 {
     printf("----------------------\n"
@@ -249,6 +272,7 @@ void imprimeCliente(CLIENTE C)
            C.nome, C.CPF_CNPJ, C.codigo, C.telefone, C.endereco);
 }
 
+// Imprime o Menu "Bem Vindo"
 char imprimeBemVindo()
 {
     char escolha = '0';
@@ -268,6 +292,8 @@ char imprimeBemVindo()
     return escolha;
 }
 
+// Imprime o Menu "Gerenciar Clientes"
+// Retorna o char relativo a alguma das opções do Menu
 char imprimeGerenciarClientes()
 {
     char escolha = '0';
@@ -291,6 +317,8 @@ char imprimeGerenciarClientes()
     return escolha;
 }
 
+// Imprime o Menu "Gerenciar Contas"
+// Retorna o char relativo a alguma das opções do Menu
 char imprimeGerenciarContas()
 {
     char escolha = '0';
@@ -316,6 +344,8 @@ char imprimeGerenciarContas()
     return escolha;
 }
 
+// Imprime o Menu "Busca"
+// Retorna o char relativo a alguma das opções do Menu
 char imprimeMenuBusca()
 {
     char escolha = '0';
@@ -336,6 +366,8 @@ char imprimeMenuBusca()
     return escolha;
 }
 
+// Imprime o Menu "Atualização/Exclusão"
+// Retorna o char relativo a alguma das opções do Menu
 char imprimeMenuAtualizacao_Exclusao()
 {
     char escolha = '0';
@@ -359,6 +391,9 @@ char imprimeMenuAtualizacao_Exclusao()
     return escolha;
 }
 
+// Essa função recebe um char
+// Se o char recebido for uma letra minúscula, ela retorna esse char maiúsculo
+// Se não uma letra minúscula, o próprio char recebido é retornado
 char paraMaiuscula(char c)
 {
     if (c >= 97 && c <= 122)

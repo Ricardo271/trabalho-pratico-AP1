@@ -11,9 +11,9 @@ CLIENTE cadastraCliente();
 
 void organizaClientes(CLIENTE C[]);
 
-void listaClientes(CLIENTE C[]);
+void listaClientes();
 
-int buscaClientes(CLIENTE C[], char opcao, char string[]);
+int buscaClientes(char opcao, char string[]);
 
 int atualizaCliente(int indice);
 
