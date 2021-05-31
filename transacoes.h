@@ -8,6 +8,7 @@ typedef struct tm tm;
 
 typedef struct _TRANSACAO
 {
+    int codConta;
     bool debito;
     bool credito;
     double valor;

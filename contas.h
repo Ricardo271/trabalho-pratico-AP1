@@ -8,9 +8,8 @@ typedef struct _CONTA
 {
     int agencia;
     int numeroConta;
+    int codConta; // O código é a agencia concatenada com o número da conta
     double saldo;
-    TRANSACAO *ptTransacoes;
-    int transacoes_realizadas;
 } CONTA;
 
 void cadastraConta();

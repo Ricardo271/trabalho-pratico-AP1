@@ -11,6 +11,9 @@
 CLIENTE cliente[SIZE];
 int clientes_registrados = 0;
 
+TRANSACAO *transacao;
+int transacoes_realizadas = 0;
+
 //TODO: colocar esse protótipo em algum dos arquivos .h
 void carregaClientes();
 
@@ -527,6 +530,8 @@ void cadastraConta()
 
     //cliente[indexCliente].conta[aux].numeroConta = 200;
 
+    cliente[indexCliente].conta[aux].codConta = (cliente[indexCliente].conta[aux].agencia * 1000) + cliente[indexCliente].conta[aux].codConta;
+
     cliente[indexCliente].conta[aux].saldo = 0;
 
     cliente[indexCliente].contas_registradas++;
@@ -550,7 +555,9 @@ void imprimeContas(CLIENTE C)
     {
         printf("Agencia: %d\n", C.conta[i].agencia);
         printf("Numero da conta: %d\n", C.conta[i].numeroConta);
+        printf("Codigo da conta: %d\n", C.conta[i].codConta);
         printf("Saldo: %lf\n", C.conta[i].saldo);
+        printf("------------------------\n");
     }
 }
 
@@ -614,3 +621,4 @@ CONTA realizaDeposito(CONTA conta)
 
     return conta;
 }
+
