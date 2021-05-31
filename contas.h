@@ -1,9 +1,6 @@
 #ifndef CONTAS
 #define CONTAS
 
-#include "clientes.h"
-#include "transacoes.h"
-
 typedef struct _CONTA
 {
     int agencia;

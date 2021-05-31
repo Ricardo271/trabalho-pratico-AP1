@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "clientes.h"
 #include "menus.h"
@@ -650,6 +651,7 @@ void realizarSaque(CONTA *conta, double valor)
     }
 
     conta->saldo -= valor;
+    criaTransacao(conta->codConta, 'D', valor);
     printf("Saque realizado\n");
     printf("Saldo final: %.2lf\n", conta->saldo);
 
@@ -691,3 +693,35 @@ void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
     printf("Transferencia realizada\n");
 }
 
+void criaTransacao(int codConta, char operacao, double valor)
+{
+    char descricao[100];
+    printf("Insira uma descrição para a sua transacao: ");
+    fgets(descricao, sizeof(descricao), stdin);
+    //while(getchar() != '\n');
+
+    if(transacoes_realizadas == 0)
+    {
+        transacao = (TRANSACAO *) malloc(sizeof(TRANSACAO));
+    } else
+    {
+        transacao = (TRANSACAO *) realloc(transacao, sizeof(TRANSACAO) * (transacoes_realizadas + 1));
+    }
+    strcpy(transacao[transacoes_realizadas].descricao, descricao);
+
+    if(operacao == 'C')
+    {
+        transacao[transacoes_realizadas].credito = true;
+        transacao[transacoes_realizadas].debito = false;
+    } else 
+    {
+        transacao[transacoes_realizadas].credito = false;
+        transacao[transacoes_realizadas].debito = true;
+    }
+
+    transacao[transacoes_realizadas].codConta = codConta;
+    transacao[transacoes_realizadas].valor = valor;
+
+    time_t agora;
+    transacao[transacoes_realizadas].data = localtime(&agora);
+}
