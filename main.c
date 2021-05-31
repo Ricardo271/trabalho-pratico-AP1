@@ -3,6 +3,8 @@
 
 #include "clientes.h"
 #include "menus.h"
+#include "contas.h"
+#include "transacoes.h"
 
 #define SIZE 100
 
@@ -48,7 +50,7 @@ int main()
                 }
                 else if (escolha == 'A')
                 {
-                    escolha = imprimeMenuAtualizacao_Exclusao();
+                    escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
                     getchar();
@@ -64,7 +66,7 @@ int main()
                 }
                 else if (escolha == 'E')
                 {
-                    escolha = imprimeMenuAtualizacao_Exclusao();
+                    escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
                     getchar();
@@ -77,7 +79,7 @@ int main()
                         clientes_registrados--;
                     }
                 }
-
+                
                 // Reseta a escolha
                 if (escolha != 'S')
                     escolha = '0';
@@ -88,8 +90,16 @@ int main()
             while (escolha != 'S')
             {
                 escolha = imprimeGerenciarContas();
-                if (escolha == 'L')
+                if (escolha == 'R')
                 {
+
+                } else if (escolha == 'C')
+                {
+                    escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
+                    char string[15];
+                    scanf("%s", &string);
+                    getchar();
+                    
 
                 }
             }
@@ -321,7 +331,6 @@ char imprimeGerenciarClientes()
     return escolha;
 }
 
-
 // Imprime o Menu "Busca"
 // Retorna o char relativo a alguma das opções do Menu
 char imprimeMenuBusca()
@@ -346,7 +355,7 @@ char imprimeMenuBusca()
 
 // Imprime o Menu "Atualização/Exclusão"
 // Retorna o char relativo a alguma das opções do Menu
-char imprimeMenuAtualizacao_Exclusao()
+char imprimeMenuEscolhaCodOuCPF_CNPJ()
 {
     char escolha = '0';
     while (escolha != 'C' && escolha != 'D')
@@ -415,4 +424,38 @@ void carregaClientes()
         i++;
     }
     clientes_registrados = i;
+}
+
+
+/* -- CONTAS -- */
+
+void cadastraConta()
+{
+    char escolha;
+    char string[15];
+    int indexCliente;
+    int aux;
+    escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
+    scanf("%s", &string);
+    getchar();
+    indexCliente = buscaClientes(escolha, string);
+    if(indexCliente == -1)
+    {
+        printf("Cliente não existente");
+        return;
+    }
+    
+    if(cliente[indexCliente].conta[0].numeroConta != 0)
+    {
+        aux = 1;
+    }
+    printf("Insira a agência: ");
+    scanf("%d", cliente[indexCliente].conta[aux].agencia);
+
+    printf("Insira o número da conta: ");
+    scanf("%d", cliente[indexCliente].conta[aux].numeroConta);
+
+    cliente[indexCliente].conta[aux].saldo = 0;
+
+    printf("Conta cadastrada");
 }

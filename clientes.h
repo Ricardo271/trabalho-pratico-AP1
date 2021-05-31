@@ -1,3 +1,8 @@
+#ifndef CLIENTES
+#define CLIENTES
+
+#include "contas.h"
+
 typedef struct _CLIENTE
 {
     char codigo[11];
@@ -5,6 +10,7 @@ typedef struct _CLIENTE
     char CPF_CNPJ[20];
     char telefone[20]; // +55 62 91234-1234
     char endereco[100];
+    CONTA conta[2];
 } CLIENTE;
 
 CLIENTE cadastraCliente();
@@ -20,3 +26,5 @@ int atualizaCliente(int indice);
 int excluiCliente(int indice);
 
 void imprimeCliente();
+
+#endif // CLIENTES
