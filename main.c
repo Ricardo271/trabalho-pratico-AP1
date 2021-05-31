@@ -113,10 +113,39 @@ int main()
                     }
                 } else if (escolha == 'W')
                 {
-
+                    int agencia = 0;
+                    int numeroConta = 0;
+                    int indexCliente = 0;
+                    int indexConta = 0;
+                    printf("Insira a agencia: ");
+                    scanf("%d", &agencia);
+                    printf("Insira o número da conta: ");
+                    scanf("%d", &numeroConta);
+                    buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
+                    if(indexCliente == -1)
+                    {
+                        printf("Cliente não encontrado\n");
+                    } else{
+                        cliente[indexCliente].conta[indexConta] = realizarSaque(cliente[indexCliente].conta[indexConta]);
+                    }
                 } else if (escolha == 'D')
                 {
-
+                    int agencia = 0;
+                    int numeroConta = 0;
+                    int indexCliente = 0;
+                    int indexConta = 0;
+                    printf("Insira a agencia: ");
+                    scanf("%d", &agencia);
+                    printf("Insira o número da conta: ");
+                    scanf("%d", &numeroConta);
+                    buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
+                    if(indexCliente == -1)
+                    {
+                        printf("Cliente não encontrado\n");
+                    } else 
+                    {
+                        cliente[indexCliente].conta[indexConta] = realizaDeposito(cliente[indexCliente].conta[indexConta]);
+                    }
                 } else if (escolha == 'T')
                 {
 
@@ -525,3 +554,63 @@ void imprimeContas(CLIENTE C)
     }
 }
 
+void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta)
+{
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        for(int j = 0; j < cliente[i].contas_registradas; j++)
+        {
+            if(cliente[i].conta[j].agencia == agencia && cliente[i].conta[j].numeroConta == numeroConta)
+            {
+                *indexCliente = i;
+                *indexConta = j;
+                return;
+            }
+        }
+    }
+    *indexCliente = -1;
+}
+
+CONTA realizarSaque(CONTA conta)
+{
+    double valor;
+    printf("Conta: %i/%i\n", conta.agencia, conta.numeroConta);
+    printf("Saldo atual: %lf\n", conta.saldo);
+    printf("\nInsira o valor a ser sacado:");
+    scanf("%lf", &valor);
+    while(getchar() != '\n');
+
+    if(valor <= 0 || conta.saldo < valor)
+    {
+        printf("Valor inválido ou saldo insuficiente\n");
+        return conta;
+    }
+
+    conta.saldo -= valor;
+    printf("Saque realizado\n");
+    printf("Saldo final: %lf\n", conta.saldo);
+
+    return conta;
+}
+
+CONTA realizaDeposito(CONTA conta)
+{
+    double valor;
+    printf("Conta: %d-%d\n", conta.agencia, conta.numeroConta);
+    printf("Saldo atual: %lf\n", conta.saldo);
+    printf("\nInsira o valor a ser depositado: ");
+    scanf("%lf", &valor);
+    while(getchar() != '\n');
+
+    if(valor <= 0)
+    {
+        printf("Valor inválido\n");
+        return conta;
+    }
+
+    conta.saldo += valor;
+    printf("Depósito realizado\n");
+    printf("Saldo final: %lf\n", conta.saldo);
+
+    return conta;
+}
