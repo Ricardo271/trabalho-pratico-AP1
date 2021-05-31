@@ -10,6 +10,7 @@ typedef struct _CLIENTE
     char CPF_CNPJ[20];
     char telefone[20]; // +55 62 91234-1234
     char endereco[100];
+    int contas_registradas;
     CONTA conta[2];
 } CLIENTE;
 

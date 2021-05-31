@@ -92,16 +92,42 @@ int main()
                 escolha = imprimeGerenciarContas();
                 if (escolha == 'R')
                 {
-
+                    listaTodasContas();
                 } else if (escolha == 'C')
+                {
+                    cadastraConta();
+                } else if (escolha == 'L')
                 {
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
                     getchar();
-                    
+                    int aux;
+                    aux = buscaClientes(escolha, string);
+                    if(aux == -1)
+                    {
+                        printf("\nCliente não encontrado\n\n");
+                    } else
+                    {
+                        imprimeContas(cliente[aux]);
+                    }
+                } else if (escolha == 'W')
+                {
+
+                } else if (escolha == 'D')
+                {
+
+                } else if (escolha == 'T')
+                {
+
+                } else if (escolha == 'E')
+                {
 
                 }
+
+                // Reseta a escolha
+                if (escolha != 'S')
+                    escolha = '0';
             }
         }
         escolha = imprimeBemVindo();
@@ -434,7 +460,7 @@ void cadastraConta()
     char escolha;
     char string[15];
     int indexCliente;
-    int aux;
+    int aux = 0;
     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
     scanf("%s", &string);
     getchar();
@@ -445,17 +471,57 @@ void cadastraConta()
         return;
     }
     
-    if(cliente[indexCliente].conta[0].numeroConta != 0)
+    // Confere quantas contas o cliente possui
+    if(cliente[indexCliente].contas_registradas == 0)
+    {
+        aux = 0;
+    } else if(cliente[indexCliente].contas_registradas == 1)
     {
         aux = 1;
+    } else if(cliente[indexCliente].contas_registradas == 2)
+    {
+        printf("\nO cliente já possui o máximo de contas cadastradas\n\n");
+        return;
     }
+
+    //TODO: deletar depois
+    printf("Cadastrando na 'conta[%d]'\n", aux);
     printf("Insira a agência: ");
-    scanf("%d", cliente[indexCliente].conta[aux].agencia);
+    scanf("%d", &cliente[indexCliente].conta[aux].agencia);
+    while(getchar() != '\n');
+
+    //cliente[indexCliente].conta[aux].agencia = 20;
 
     printf("Insira o número da conta: ");
-    scanf("%d", cliente[indexCliente].conta[aux].numeroConta);
+    scanf("%d", &cliente[indexCliente].conta[aux].numeroConta);
+    while(getchar() != '\n');
+
+    //cliente[indexCliente].conta[aux].numeroConta = 200;
 
     cliente[indexCliente].conta[aux].saldo = 0;
 
+    cliente[indexCliente].contas_registradas++;
     printf("Conta cadastrada");
 }
+
+// Lista todas as contas
+void listaTodasContas()
+{
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        imprimeContas(cliente[i]);
+    }
+}
+
+// Recebe um cliente e imprime as contas desse cliente
+void imprimeContas(CLIENTE C)
+{
+    imprimeCliente(C);
+    for(int i = 0; i < C.contas_registradas; i++)
+    {
+        printf("Agencia: %d\n", C.conta[i].agencia);
+        printf("Numero da conta: %d\n", C.conta[i].numeroConta);
+        printf("Saldo: %lf\n", C.conta[i].saldo);
+    }
+}
+

@@ -5,11 +5,15 @@
 
 typedef struct _CONTA
 {
-    char agencia[20];
+    int agencia;
     int numeroConta;
     double saldo;
 } CONTA;
 
 void cadastraConta();
+
+void listaTodasContas();
+
+void imprimeContas();
 
 #endif // CONTAS
