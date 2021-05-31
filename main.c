@@ -129,14 +129,21 @@ int main()
                     {
                         printf("Cliente não encontrado\n");
                     } else{
-                        cliente[indexCliente].conta[indexConta] = realizarSaque(cliente[indexCliente].conta[indexConta]);
+                        double valor;
+                        printf("Conta: %i-%i\n", cliente[indexCliente].conta[indexConta].agencia, cliente[indexCliente].conta[indexConta].numeroConta);
+                        printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
+                        printf("\nInsira o valor a ser sacado: ");
+                        scanf("%lf", &valor);
+                        while(getchar() != '\n');
+
+                        realizarSaque(&cliente[indexCliente].conta[indexConta], valor);
                     }
                 } else if (escolha == 'D')
                 {
                     int agencia = 0;
                     int numeroConta = 0;
-                    int indexCliente = 0;
-                    int indexConta = 0;
+                    int indexCliente = -1;
+                    int indexConta = -1;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
                     printf("Insira o número da conta: ");
@@ -147,11 +154,56 @@ int main()
                         printf("Cliente não encontrado\n");
                     } else 
                     {
-                        cliente[indexCliente].conta[indexConta] = realizaDeposito(cliente[indexCliente].conta[indexConta]);
+                        double valor;
+                        printf("Conta: %i-%i\n", cliente[indexCliente].conta[indexConta].agencia, cliente[indexCliente].conta[indexConta].numeroConta);
+                        printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
+                        printf("\nInsira o valor a ser depositado: ");
+                        scanf("%lf", &valor);
+                        while(getchar() != '\n');
+
+                        realizaDeposito(&cliente[indexCliente].conta[indexConta], valor);
                     }
                 } else if (escolha == 'T')
                 {
+                    int indexClienteOrigem = -1;
+                    int indexContaOrigem = -1;
+                    int indexClienteDestino = -1;
+                    int indexContaDestino = -1;
+                    int agencia = 0;
+                    int numeroConta = 0;
+                    printf(" Conta Origem \n");
+                    printf("Insira a agencia: ");
+                    scanf("%d", &agencia);
+                    printf("Insira o numero da conta: ");
+                    scanf("%d", &numeroConta);
+                    buscaConta(agencia, numeroConta, &indexClienteOrigem, &indexContaOrigem);
+                    if(indexClienteOrigem == -1)
+                    {
+                        printf("Conta de origem não encontrada\n");
+                    } else
+                    {
+                        // O cliente da conta origem existe, portanto seus dados são imprimidos
+                        imprimeCliente(cliente[indexClienteOrigem]);
+                        imprimeUmaConta(cliente[indexClienteOrigem].conta[indexContaOrigem]);
 
+                        printf(" Conta Destino \n");
+                        printf("Insira a agencia: ");
+                        scanf("%d", &agencia);
+                        printf("Insira o numero da conta: ");
+                        scanf("%d", &numeroConta);
+                        buscaConta(agencia, numeroConta, &indexClienteDestino, &indexContaDestino);
+                        if(indexClienteDestino == -1)
+                        {
+                            printf("Conta de destino não encontrada\n");
+                        } else
+                        {
+                            // O cliente da conta destino exite, portanto seus dados são imprimidos
+                            imprimeCliente(cliente[indexClienteDestino]);
+                            imprimeUmaConta(cliente[indexClienteDestino].conta[indexContaDestino]);
+
+                            realizaTransferencia(&cliente[indexClienteOrigem].conta[indexContaOrigem], &cliente[indexClienteDestino].conta[indexContaDestino]);
+                        }
+                    }
                 } else if (escolha == 'E')
                 {
 
@@ -194,6 +246,7 @@ CLIENTE cadastraCliente()
     strcpy(C.CPF_CNPJ, CPF_CNPJ);
     strcpy(C.telefone, telefone);
     strcpy(C.endereco, endereco);
+    C.contas_registradas = 0;
 
     return C;
 }
@@ -499,7 +552,7 @@ void cadastraConta()
     indexCliente = buscaClientes(escolha, string);
     if(indexCliente == -1)
     {
-        printf("Cliente não existente");
+        printf("Cliente não existente\n");
         return;
     }
     
@@ -517,7 +570,7 @@ void cadastraConta()
     }
 
     //TODO: deletar depois
-    printf("Cadastrando na 'conta[%d]'\n", aux);
+    printf("Cadastrando na 'conta[%d]' do cliente %s\n", aux, cliente[indexCliente].nome);
     printf("Insira a agência: ");
     scanf("%d", &cliente[indexCliente].conta[aux].agencia);
     while(getchar() != '\n');
@@ -530,12 +583,12 @@ void cadastraConta()
 
     //cliente[indexCliente].conta[aux].numeroConta = 200;
 
-    cliente[indexCliente].conta[aux].codConta = (cliente[indexCliente].conta[aux].agencia * 1000) + cliente[indexCliente].conta[aux].codConta;
+    cliente[indexCliente].conta[aux].codConta = (cliente[indexCliente].conta[aux].agencia * 1000) + cliente[indexCliente].conta[aux].numeroConta;
 
     cliente[indexCliente].conta[aux].saldo = 0;
 
     cliente[indexCliente].contas_registradas++;
-    printf("Conta cadastrada");
+    printf("Conta cadastrada\n");
 }
 
 // Lista todas as contas
@@ -553,12 +606,23 @@ void imprimeContas(CLIENTE C)
     imprimeCliente(C);
     for(int i = 0; i < C.contas_registradas; i++)
     {
-        printf("Agencia: %d\n", C.conta[i].agencia);
-        printf("Numero da conta: %d\n", C.conta[i].numeroConta);
-        printf("Codigo da conta: %d\n", C.conta[i].codConta);
-        printf("Saldo: %lf\n", C.conta[i].saldo);
-        printf("------------------------\n");
+        imprimeUmaConta(C.conta[i]);
+        // printf("Agencia: %d\n", C.conta[i].agencia);
+        // printf("Numero da conta: %d\n", C.conta[i].numeroConta);
+        // printf("Codigo da conta: %d\n", C.conta[i].codConta);
+        // printf("Saldo: %lf\n", C.conta[i].saldo);
+        // printf("------------------------\n");
     }
+}
+
+// Imprime uma conta específica
+void imprimeUmaConta(CONTA CNT)
+{
+    printf("Agencia: %d\n", CNT.agencia);
+    printf("Numero da conta: %d\n", CNT.numeroConta);
+    printf("Codigo da conta: %d\n", CNT.codConta);
+    printf("Saldo: %.2lf\n", CNT.saldo);
+    printf("-------------------------------\n");
 }
 
 void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta)
@@ -578,47 +642,52 @@ void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta
     *indexCliente = -1;
 }
 
-CONTA realizarSaque(CONTA conta)
+void realizarSaque(CONTA *conta, double valor)
 {
-    double valor;
-    printf("Conta: %i/%i\n", conta.agencia, conta.numeroConta);
-    printf("Saldo atual: %lf\n", conta.saldo);
-    printf("\nInsira o valor a ser sacado:");
-    scanf("%lf", &valor);
-    while(getchar() != '\n');
-
-    if(valor <= 0 || conta.saldo < valor)
+    if(valor <= 0 || conta->saldo < valor)
     {
         printf("Valor inválido ou saldo insuficiente\n");
-        return conta;
     }
 
-    conta.saldo -= valor;
+    conta->saldo -= valor;
     printf("Saque realizado\n");
-    printf("Saldo final: %lf\n", conta.saldo);
+    printf("Saldo final: %.2lf\n", conta->saldo);
 
-    return conta;
 }
 
-CONTA realizaDeposito(CONTA conta)
+void realizaDeposito(CONTA *conta, double valor)
+{
+    if(valor <= 0)
+    {
+        printf("Valor inválido\n");
+    }
+
+    conta->saldo += valor;
+    printf("Depósito realizado\n");
+    printf("Saldo final: %.2lf\n", conta->saldo);
+
+}
+
+void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
 {
     double valor;
-    printf("Conta: %d-%d\n", conta.agencia, conta.numeroConta);
-    printf("Saldo atual: %lf\n", conta.saldo);
-    printf("\nInsira o valor a ser depositado: ");
+    printf("Realizando Transferencia da Conta %d-%d para a conta %d-%d\n", contaOrigem->agencia, contaOrigem->numeroConta, contaDestino->agencia, contaDestino->numeroConta);
+    printf("Insira o valor a ser transferido: ");
     scanf("%lf", &valor);
     while(getchar() != '\n');
 
     if(valor <= 0)
     {
-        printf("Valor inválido\n");
-        return conta;
+        printf("O valor a ser transferido não pode ser nulo ou negativo\n");
+        return;
+    } else if(valor > contaOrigem->saldo)
+    {
+        printf("A conta de origem não tem fundos o suficiente\n");
+        return;
     }
 
-    conta.saldo += valor;
-    printf("Depósito realizado\n");
-    printf("Saldo final: %lf\n", conta.saldo);
-
-    return conta;
+    contaOrigem->saldo -= valor;
+    contaDestino->saldo += valor;
+    printf("Transferencia realizada\n");
 }
 
