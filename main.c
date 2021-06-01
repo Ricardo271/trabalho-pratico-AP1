@@ -123,8 +123,10 @@ int main()
                     int indexConta = 0;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
+                    getchar();
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
+                    getchar();
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexCliente == -1)
                     {
@@ -135,6 +137,7 @@ int main()
                         printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
                         printf("\nInsira o valor a ser sacado: ");
                         scanf("%lf", &valor);
+                        getchar();
                         while(getchar() != '\n');
 
                         realizarSaque(&cliente[indexCliente].conta[indexConta], valor);
@@ -147,8 +150,10 @@ int main()
                     int indexConta = -1;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
+                    getchar();
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
+                    getchar();
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexCliente == -1)
                     {
@@ -160,6 +165,7 @@ int main()
                         printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
                         printf("\nInsira o valor a ser depositado: ");
                         scanf("%lf", &valor);
+                        //getchar();
                         while(getchar() != '\n');
 
                         realizaDeposito(&cliente[indexCliente].conta[indexConta], valor);
@@ -175,8 +181,10 @@ int main()
                     printf(" Conta Origem \n");
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
+                    getchar();
                     printf("Insira o numero da conta: ");
                     scanf("%d", &numeroConta);
+                    getchar();
                     buscaConta(agencia, numeroConta, &indexClienteOrigem, &indexContaOrigem);
                     if(indexClienteOrigem == -1)
                     {
@@ -190,8 +198,10 @@ int main()
                         printf(" Conta Destino \n");
                         printf("Insira a agencia: ");
                         scanf("%d", &agencia);
+                        getchar();
                         printf("Insira o numero da conta: ");
                         scanf("%d", &numeroConta);
+                        getchar();
                         buscaConta(agencia, numeroConta, &indexClienteDestino, &indexContaDestino);
                         if(indexClienteDestino == -1)
                         {
@@ -213,8 +223,10 @@ int main()
                     int indexConta = -1;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
+                    getchar();
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
+                    getchar();
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexConta == -1)
                     {
@@ -591,12 +603,14 @@ void cadastraConta()
     printf("Cadastrando na 'conta[%d]' do cliente %s\n", aux, cliente[indexCliente].nome);
     printf("Insira a agência: ");
     scanf("%d", &cliente[indexCliente].conta[aux].agencia);
+    //getchar();
     while(getchar() != '\n');
 
     //cliente[indexCliente].conta[aux].agencia = 20;
 
     printf("Insira o número da conta: ");
     scanf("%d", &cliente[indexCliente].conta[aux].numeroConta);
+    //getchar()
     while(getchar() != '\n');
 
     //cliente[indexCliente].conta[aux].numeroConta = 200;
@@ -682,6 +696,7 @@ void realizaDeposito(CONTA *conta, double valor)
     }
 
     conta->saldo += valor;
+    criaTransacao(conta->codConta, 'C', valor);
     printf("Depósito realizado\n");
     printf("Saldo final: %.2lf\n", conta->saldo);
 
@@ -693,6 +708,7 @@ void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
     printf("Realizando Transferencia da Conta %d-%d para a conta %d-%d\n", contaOrigem->agencia, contaOrigem->numeroConta, contaDestino->agencia, contaDestino->numeroConta);
     printf("Insira o valor a ser transferido: ");
     scanf("%lf", &valor);
+    getchar();
     while(getchar() != '\n');
 
     if(valor <= 0)
