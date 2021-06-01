@@ -11,6 +11,8 @@ typedef struct _CONTA
 
 void cadastraConta();
 
+void organizaClientes(CLIENTE C[]);
+
 void listaTodasContas();
 
 void imprimeContas();

@@ -16,7 +16,7 @@ typedef struct _TRANSACAO
     char descricao[100];
 } TRANSACAO;
 
-void criaTransacao(int codConta, char operacao, double valor);
+void criaTransacao(int codConta, char operacao, double valor, char descrico[]);
 
 void imprimeTransacao(TRANSACAO T);
 

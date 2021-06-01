@@ -15,12 +15,9 @@ int clientes_registrados = 0;
 TRANSACAO *transacao;
 int transacoes_realizadas = 0;
 
-//TODO: colocar esse protótipo em algum dos arquivos .h
-void carregaClientes();
-
 int main()
 {
-    carregaClientes();
+
 
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
@@ -33,7 +30,6 @@ int main()
                 if (escolha == 'C')
                 {
                     cliente[clientes_registrados] = cadastraCliente();
-                    clientes_registrados++;
                 }
                 else if (escolha == 'L')
                 {
@@ -248,10 +244,18 @@ int main()
     }
 }
 
+/* -- CLIENTES -- */
+
 // Essa função pede os dados do cliente cria um CLIENTE com esses dados e retorna esse cliente
 CLIENTE cadastraCliente()
 {
-    char codigo[15] = "1234";
+    CLIENTE C;
+
+    if(clientes_registrados >= 100)
+    {
+        printf("Numero maximo de clientes atingido\n");
+        return C;
+    }
 
     char nome[100];
     printf("Nome: ");
@@ -261,6 +265,25 @@ CLIENTE cadastraCliente()
     printf("CPF/CNPJ: ");
     fgets(CPF_CNPJ, sizeof(CPF_CNPJ), stdin);
 
+    char codigo[5];
+    printf("Codigo: ");
+    fgets(codigo, sizeof(codigo), stdin); 
+    getchar();
+
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        if(!strcmp(CPF_CNPJ, cliente[i].CPF_CNPJ))
+        {
+            printf("CPF/CNPJ inválido\n");
+            return C;
+        }
+        if(codigo == cliente[i].codigo)
+        {
+            printf("Codigo invalido\n");
+            return C;
+        }
+    }
+
     char telefone[20];
     printf("Telefone: ");
     fgets(telefone, sizeof(telefone), stdin);
@@ -269,8 +292,6 @@ CLIENTE cadastraCliente()
     printf("Endereço: ");
     fgets(endereco, sizeof(endereco), stdin);
 
-    CLIENTE C;
-
     strcpy(C.codigo, codigo);
     strcpy(C.nome, nome);
     strcpy(C.CPF_CNPJ, CPF_CNPJ);
@@ -278,35 +299,43 @@ CLIENTE cadastraCliente()
     strcpy(C.endereco, endereco);
     C.contas_registradas = 0;
 
+    clientes_registrados++;
     return C;
 }
 
-// TODO!:
-int verificaCodigos()
+// Essa função organiza os elementos do array de cliente por ordem alfabética, usando um bubble sort
+void organizaClientes(CLIENTE C[])
 {
-    for (int i = 0; i < 100; i++)
+    CLIENTE temp;
+    bool trocou = true;
+
+    while(trocou)
     {
-        for (int j = 0; j < 100; j++)
+        trocou = false;
+        for(int i = 0; i < clientes_registrados - 1; i++)
         {
-            if (!strcmp(cliente[i].codigo, cliente[j].codigo))
+            if(strcmp(cliente[i+1].nome, cliente[i].nome) < 0)
             {
-                return 0;
+                temp = cliente[i];
+                cliente[i] = cliente[i+1];
+                cliente[i+1] = temp;
+                trocou = true;
             }
         }
     }
 }
 
-// !TODO
-void organizaClientes(CLIENTE C[])
-{
-    return;
-}
-
 // Essa função lista todos os clientes cadastrados
 void listaClientes()
 {
-    // TODO
-    //organizaClientes(cliente);
+    organizaClientes(cliente);
+
+    if(clientes_registrados == 0)
+    {
+        printf("Nenhum cliente cadastrado\n");
+        return;
+    }
+
     for (int i = 0; i < clientes_registrados; i++)
     {
         // Valores obtidos com o fgets() ficam com o ENTER final
@@ -380,7 +409,6 @@ int atualizaCliente(int indice)
             break;
         }
     }
-    //TODO: lembrar de colocar alguma verificação se o cliente realmente foi cadastrado
 }
 
 // Essa função recebe o índice do cliente que deve ser excluído
@@ -407,7 +435,7 @@ int excluiCliente(int indice)
     {
         cliente[i] = cliente[i+1];
     }
-    // - Essa parte não é necessária pois o número de clientes registrados deve ser redizido logo após o uso dessa função
+    // - Essa parte não é necessária pois o número de clientes registrados deve ser reduzido logo após o uso dessa função
     // Para remover o último cliente do array, um cliente vazio auxiliar é criado e o ultimo cliente recebe o valor dele
     //CLIENTE aux; 
     //cliente[clientes_registrados - 1] = aux;
@@ -426,6 +454,8 @@ void imprimeCliente(CLIENTE C)
            "---------------------\n",
            C.nome, C.CPF_CNPJ, C.codigo, C.telefone, C.endereco);
 }
+
+/* -- MENUS -- */
 
 // Imprime o Menu "Bem Vindo"
 char imprimeBemVindo()
@@ -556,18 +586,6 @@ char paraMaiuscula(char c)
     return c;
 }
 
-//TODO:
-void carregaClientes()
-{
-    int i = 0;
-    while (cliente[i].nome[0] != 0)
-    {
-        i++;
-    }
-    clientes_registrados = i;
-}
-
-
 /* -- CONTAS -- */
 
 void cadastraConta()
@@ -601,19 +619,16 @@ void cadastraConta()
 
     //TODO: deletar depois
     printf("Cadastrando na 'conta[%d]' do cliente %s\n", aux, cliente[indexCliente].nome);
+
     printf("Insira a agência: ");
     scanf("%d", &cliente[indexCliente].conta[aux].agencia);
     //getchar();
     while(getchar() != '\n');
 
-    //cliente[indexCliente].conta[aux].agencia = 20;
-
     printf("Insira o número da conta: ");
     scanf("%d", &cliente[indexCliente].conta[aux].numeroConta);
     //getchar()
     while(getchar() != '\n');
-
-    //cliente[indexCliente].conta[aux].numeroConta = 200;
 
     cliente[indexCliente].conta[aux].codConta = (cliente[indexCliente].conta[aux].agencia * 1000) + cliente[indexCliente].conta[aux].numeroConta;
 
@@ -621,6 +636,12 @@ void cadastraConta()
 
     cliente[indexCliente].contas_registradas++;
     printf("Conta cadastrada\n");
+}
+
+// TODO:
+void organizaContas(CLIENTE C[])
+{
+
 }
 
 // Lista todas as contas
@@ -635,15 +656,16 @@ void listaTodasContas()
 // Recebe um cliente e imprime as contas desse cliente
 void imprimeContas(CLIENTE C)
 {
-    imprimeCliente(C);
+    if(C.contas_registradas == 0)
+    {
+        printf("Nenhuma conta encontrada\n");
+        printf("---------------------------\n");
+        return;
+    }
+        imprimeCliente(C);
     for(int i = 0; i < C.contas_registradas; i++)
     {
         imprimeUmaConta(C.conta[i]);
-        // printf("Agencia: %d\n", C.conta[i].agencia);
-        // printf("Numero da conta: %d\n", C.conta[i].numeroConta);
-        // printf("Codigo da conta: %d\n", C.conta[i].codConta);
-        // printf("Saldo: %lf\n", C.conta[i].saldo);
-        // printf("------------------------\n");
     }
 }
 
@@ -679,10 +701,14 @@ void realizarSaque(CONTA *conta, double valor)
     if(valor <= 0 || conta->saldo < valor)
     {
         printf("Valor inválido ou saldo insuficiente\n");
+        return;
     }
 
     conta->saldo -= valor;
-    criaTransacao(conta->codConta, 'D', valor);
+    char descricao[100];
+    printf("Insira uma descrição para a sua transacao: ");
+    fgets(descricao, sizeof(descricao), stdin);
+    criaTransacao(conta->codConta, 'D', valor, descricao);
     printf("Saque realizado\n");
     printf("Saldo final: %.2lf\n", conta->saldo);
 
@@ -693,13 +719,16 @@ void realizaDeposito(CONTA *conta, double valor)
     if(valor <= 0)
     {
         printf("Valor inválido\n");
+        return;
     }
 
     conta->saldo += valor;
-    criaTransacao(conta->codConta, 'C', valor);
+    char descricao[100];
+    printf("Insira uma descrição para a sua transacao: ");
+    fgets(descricao, sizeof(descricao), stdin);
+    criaTransacao(conta->codConta, 'C', valor, descricao);
     printf("Depósito realizado\n");
     printf("Saldo final: %.2lf\n", conta->saldo);
-
 }
 
 void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
@@ -722,18 +751,14 @@ void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
     }
 
     contaOrigem->saldo -= valor;
+    criaTransacao(contaOrigem->codConta, 'D', valor, "Descricao conta origem");
     contaDestino->saldo += valor;
+    criaTransacao(contaDestino->codConta, 'C', valor, "Descricao conta destino");
     printf("Transferencia realizada\n");
 }
 
-void criaTransacao(int codConta, char operacao, double valor)
+void criaTransacao(int codConta, char operacao, double valor, char descricao[])
 {
-    char descricao[100];
-    printf("Insira uma descrição para a sua transacao: ");
-    fgets(descricao, sizeof(descricao), stdin);
-    //char ch;
-    //while((ch = getchar()) != '\n' && ch != EOF);
-
     if(transacoes_realizadas == 0)
     {
         transacao = (TRANSACAO *) malloc(sizeof(TRANSACAO));

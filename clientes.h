@@ -5,7 +5,7 @@
 
 typedef struct _CLIENTE
 {
-    char codigo[11];
+    char codigo[5];
     char nome[50];
     char CPF_CNPJ[20];
     char telefone[20]; // +55 62 91234-1234
