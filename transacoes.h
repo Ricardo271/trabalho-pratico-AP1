@@ -18,4 +18,8 @@ typedef struct _TRANSACAO
 
 void criaTransacao(int codConta, char operacao, double valor);
 
+void imprimeTransacao(TRANSACAO T);
+
+void exibeExtrato(int codigo);
+
 #endif //TRANSACOES

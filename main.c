@@ -207,7 +207,24 @@ int main()
                     }
                 } else if (escolha == 'E')
                 {
-
+                    int agencia = 0;
+                    int numeroConta = 0;
+                    int indexCliente = -1;
+                    int indexConta = -1;
+                    printf("Insira a agencia: ");
+                    scanf("%d", &agencia);
+                    printf("Insira o número da conta: ");
+                    scanf("%d", &numeroConta);
+                    buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
+                    if(indexConta == -1)
+                    {
+                        printf("Conta não encontrada\n");
+                    } else
+                    {
+                        imprimeCliente(cliente[indexCliente]);
+                        imprimeUmaConta(cliente[indexCliente].conta[indexConta]);
+                        exibeExtrato(cliente[indexCliente].conta[indexConta].codConta);
+                    }
                 }
 
                 // Reseta a escolha
@@ -698,7 +715,8 @@ void criaTransacao(int codConta, char operacao, double valor)
     char descricao[100];
     printf("Insira uma descrição para a sua transacao: ");
     fgets(descricao, sizeof(descricao), stdin);
-    //while(getchar() != '\n');
+    //char ch;
+    //while((ch = getchar()) != '\n' && ch != EOF);
 
     if(transacoes_realizadas == 0)
     {
@@ -724,4 +742,30 @@ void criaTransacao(int codConta, char operacao, double valor)
 
     time_t agora;
     transacao[transacoes_realizadas].data = localtime(&agora);
+    transacoes_realizadas++;
+}
+
+void imprimeTransacao(TRANSACAO T)
+{
+    if(T.credito)
+    {
+        printf("Tipo de operacao: CREDITO\n");
+    } else
+    {
+        printf("Tipo de operacao: DEBITO\n");
+    }
+    printf("Descricao: %s\n", T.descricao);
+    printf("Valor: %lf\n", T.valor);
+    printf("Data: %d/%d/%d\n", T.data->tm_mday + 1, T.data->tm_mon - 1, T.data->tm_year - 1900);
+}
+
+void exibeExtrato(int codigo)
+{
+    for(int i = 0; i < transacoes_realizadas; i++)
+    {
+        if(transacao[i].codConta == codigo)
+        {
+            imprimeTransacao(transacao[i]);
+        }
+    }
 }
