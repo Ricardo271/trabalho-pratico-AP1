@@ -156,7 +156,7 @@ int main()
                         printf("Cliente não encontrado\n");
                     } else 
                     {
-                        double valor;
+                        double valor = 0;
                         printf("Conta: %i-%i\n", cliente[indexCliente].conta[indexConta].agencia, cliente[indexCliente].conta[indexConta].numeroConta);
                         printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
                         printf("\nInsira o valor a ser depositado: ");
@@ -304,7 +304,7 @@ CLIENTE cadastraCliente()
 }
 
 // Essa função organiza os elementos do array de cliente por ordem alfabética, usando um bubble sort
-void organizaClientes(CLIENTE C[])
+void organizaClientes()
 {
     CLIENTE temp;
     bool trocou = true;
@@ -328,7 +328,7 @@ void organizaClientes(CLIENTE C[])
 // Essa função lista todos os clientes cadastrados
 void listaClientes()
 {
-    organizaClientes(cliente);
+    organizaClientes();
 
     if(clientes_registrados == 0)
     {
@@ -638,15 +638,34 @@ void cadastraConta()
     printf("Conta cadastrada\n");
 }
 
-// TODO:
-void organizaContas(CLIENTE C[])
+void organizaContas(CLIENTE *C)
 {
+    CONTA temp;
+    bool trocou = true;
 
+    while(trocou)
+    {
+        trocou = false;
+        for(int j = 1; j < C->contas_registradas; j++)
+        {
+            if(C->conta[j].saldo > C->conta[j-1].saldo)
+            {
+                temp = C->conta[j];
+                C->conta[j] = C->conta[j-1];
+                C->conta[j-1] = temp;
+                trocou = true; 
+            }
+        }
+    }
 }
 
 // Lista todas as contas
 void listaTodasContas()
 {
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        organizaContas(&cliente[i]);
+    }
     for(int i = 0; i < clientes_registrados; i++)
     {
         imprimeContas(cliente[i]);
@@ -737,7 +756,6 @@ void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
     printf("Realizando Transferencia da Conta %d-%d para a conta %d-%d\n", contaOrigem->agencia, contaOrigem->numeroConta, contaDestino->agencia, contaDestino->numeroConta);
     printf("Insira o valor a ser transferido: ");
     scanf("%lf", &valor);
-    getchar();
     while(getchar() != '\n');
 
     if(valor <= 0)
@@ -786,6 +804,7 @@ void criaTransacao(int codConta, char operacao, double valor, char descricao[])
     transacoes_realizadas++;
 }
 
+//TODO: período de dias
 void imprimeTransacao(TRANSACAO T)
 {
     if(T.credito)

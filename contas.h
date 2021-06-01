@@ -1,6 +1,8 @@
 #ifndef CONTAS
 #define CONTAS
 
+#include "clientes.h"
+
 typedef struct _CONTA
 {
     int agencia;
@@ -10,8 +12,6 @@ typedef struct _CONTA
 } CONTA;
 
 void cadastraConta();
-
-void organizaClientes(CLIENTE C[]);
 
 void listaTodasContas();
 

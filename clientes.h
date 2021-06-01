@@ -16,7 +16,7 @@ typedef struct _CLIENTE
 
 CLIENTE cadastraCliente();
 
-void organizaClientes(CLIENTE C[]);
+void organizaClientes();
 
 void listaClientes();
 
