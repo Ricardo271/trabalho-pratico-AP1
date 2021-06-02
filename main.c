@@ -265,11 +265,6 @@ CLIENTE cadastraCliente()
     printf("CPF/CNPJ: ");
     fgets(CPF_CNPJ, sizeof(CPF_CNPJ), stdin);
 
-    char codigo[5];
-    printf("Codigo: ");
-    fgets(codigo, sizeof(codigo), stdin); 
-    getchar();
-
     for(int i = 0; i < clientes_registrados; i++)
     {
         if(!strcmp(CPF_CNPJ, cliente[i].CPF_CNPJ))
@@ -277,6 +272,16 @@ CLIENTE cadastraCliente()
             printf("CPF/CNPJ inválido\n");
             return C;
         }
+    }
+
+    char codigo[5];
+    printf("Codigo: ");
+    fgets(codigo, sizeof(codigo), stdin); 
+    getchar();
+
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+
         if(codigo == cliente[i].codigo)
         {
             printf("Codigo invalido\n");
@@ -800,11 +805,11 @@ void criaTransacao(int codConta, char operacao, double valor, char descricao[])
     transacao[transacoes_realizadas].valor = valor;
 
     time_t agora;
+    agora = time(NULL);
     transacao[transacoes_realizadas].data = localtime(&agora);
     transacoes_realizadas++;
 }
 
-//TODO: período de dias
 void imprimeTransacao(TRANSACAO T)
 {
     if(T.credito)
@@ -815,15 +820,22 @@ void imprimeTransacao(TRANSACAO T)
         printf("Tipo de operacao: DEBITO\n");
     }
     printf("Descricao: %s\n", T.descricao);
-    printf("Valor: %lf\n", T.valor);
-    printf("Data: %d/%d/%d\n", T.data->tm_mday + 1, T.data->tm_mon - 1, T.data->tm_year - 1900);
+    printf("Valor: %.2lf\n", T.valor);
+    printf("Data: %d/%d/%d\n", T.data->tm_mday, T.data->tm_mon + 1, T.data->tm_year + 1900);
 }
 
 void exibeExtrato(int codigo)
 {
+    int qtdDias = 0;
+    printf("Insira a quantidade de dias: ");
+    scanf("%d", &qtdDias);
+    time_t agora;
+    agora = time(NULL);
+    struct tm* hoje;
+    hoje = localtime(&agora);
     for(int i = 0; i < transacoes_realizadas; i++)
     {
-        if(transacao[i].codConta == codigo)
+        if(transacao[i].codConta == codigo && transacao[i].data->tm_yday > hoje->tm_yday - qtdDias)
         {
             imprimeTransacao(transacao[i]);
         }
