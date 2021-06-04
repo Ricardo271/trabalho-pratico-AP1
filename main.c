@@ -44,7 +44,7 @@ int main()
                     getchar();
                     int aux = buscaClientes(escolha, string);
                     if (aux == -1)
-                        printf("\nNenhum cliente foi encontrado.\n\n");
+                        printf("\nNenhum cliente foi encontrado com esses parâmetros.\n\n");
                     else
                         imprimeCliente(cliente[aux]);
                 }
@@ -61,8 +61,6 @@ int main()
                         printf("A atualização foi cancelada\n");
                     else if (aux == -1)
                         printf("Cliente não encontrado\n");
-                    else if (aux == -2)
-                        printf("Ocorreu um erro durante a atualização do cliente\n");
                 }
                 else if (escolha == 'E')
                 {
@@ -72,7 +70,7 @@ int main()
                     getchar();
                     int aux = excluiCliente(buscaClientes(escolha, string));
                     if (aux == 0)
-                        printf("A operação de exculsão foi cancelada\n");
+                        printf("A operação de exclusão foi cancelada\n");
                     else if (aux == 1) 
                     {
                         printf("O cliente foi excluído\n");
@@ -129,6 +127,7 @@ int main()
                         printf("Cliente não encontrado\n");
                     } else{
                         double valor;
+                        imprimeCliente(cliente[indexCliente]);
                         printf("Conta: %i-%i\n", cliente[indexCliente].conta[indexConta].agencia, cliente[indexCliente].conta[indexConta].numeroConta);
                         printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
                         printf("\nInsira o valor a ser sacado: ");
@@ -269,7 +268,7 @@ CLIENTE cadastraCliente()
     {
         if(!strcmp(CPF_CNPJ, cliente[i].CPF_CNPJ))
         {
-            printf("CPF/CNPJ inválido\n");
+            printf("Cliente já cadastrado\n");
             return C;
         }
     }
@@ -284,7 +283,7 @@ CLIENTE cadastraCliente()
 
         if(codigo == cliente[i].codigo)
         {
-            printf("Codigo invalido\n");
+            printf("Cliente já cadastrado\n");
             return C;
         }
     }
@@ -335,7 +334,7 @@ void listaClientes()
 {
     organizaClientes();
 
-    if(clientes_registrados == 0)
+    if(clientes_registrados <= 0)
     {
         printf("Nenhum cliente cadastrado\n");
         return;
@@ -682,7 +681,7 @@ void imprimeContas(CLIENTE C)
 {
     if(C.contas_registradas == 0)
     {
-        printf("Nenhuma conta encontrada\n");
+        printf("Nenhuma conta cadastrada\n");
         printf("---------------------------\n");
         return;
     }
@@ -722,17 +721,21 @@ void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta
 
 void realizarSaque(CONTA *conta, double valor)
 {
-    if(valor <= 0 || conta->saldo < valor)
+    if(conta->saldo < valor)
     {
-        printf("Valor inválido ou saldo insuficiente\n");
+        printf("Saldo insuficiente\n");
         return;
     }
+    //TODO
 
     conta->saldo -= valor;
     char descricao[100];
     printf("Insira uma descrição para a sua transacao: ");
     fgets(descricao, sizeof(descricao), stdin);
     criaTransacao(conta->codConta, 'D', valor, descricao);
+    
+
+
     printf("Saque realizado\n");
     printf("Saldo final: %.2lf\n", conta->saldo);
 
