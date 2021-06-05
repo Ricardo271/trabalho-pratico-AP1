@@ -43,7 +43,7 @@ int main()
                     printf("Insira o Termo de busca: ");
                     char string[100];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux = buscaClientes(escolha, string);
                     if (aux == -1)
                         printf("\nNenhum cliente foi encontrado com esses parâmetros.\n\n");
@@ -55,7 +55,7 @@ int main()
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux = atualizaCliente(buscaClientes(escolha, string));
                     if (aux == 1)
                         printf("O cliente foi atualizado com sucesso\n");
@@ -69,7 +69,7 @@ int main()
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux = excluiCliente(buscaClientes(escolha, string));
                     if (aux == 0)
                         printf("A operação de exclusão foi cancelada\n");
@@ -101,7 +101,7 @@ int main()
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux;
                     aux = buscaClientes(escolha, string);
                     if(aux == -1)
@@ -119,10 +119,10 @@ int main()
                     int indexConta = 0;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
-                    getchar();
+                    while(getchar() != '\n');
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
-                    getchar();
+                    while(getchar() != '\n');
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexCliente == -1)
                     {
@@ -146,10 +146,10 @@ int main()
                     int indexConta = -1;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
-                    getchar();
+                    while(getchar() != '\n');
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
-                    getchar();
+                    while(getchar() != '\n');
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexCliente == -1)
                     {
@@ -177,10 +177,10 @@ int main()
                     printf(" Conta Origem \n");
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
-                    getchar();
+                    while(getchar() != '\n');
                     printf("Insira o numero da conta: ");
                     scanf("%d", &numeroConta);
-                    getchar();
+                    while(getchar() != '\n');
                     buscaConta(agencia, numeroConta, &indexClienteOrigem, &indexContaOrigem);
                     if(indexClienteOrigem == -1)
                     {
@@ -196,10 +196,10 @@ int main()
                         printf(" Conta Destino \n");
                         printf("Insira a agencia: ");
                         scanf("%d", &agencia);
-                        getchar();
+                        while(getchar() != '\n');
                         printf("Insira o numero da conta: ");
                         scanf("%d", &numeroConta);
-                        getchar();
+                        while(getchar() != '\n');
                         buscaConta(agencia, numeroConta, &indexClienteDestino, &indexContaDestino);
                         if(indexClienteDestino == -1)
                         {
@@ -223,10 +223,10 @@ int main()
                     int indexConta = -1;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
-                    getchar();
+                    while(getchar() != '\n');
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
-                    getchar();
+                    while(getchar() != '\n');
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexConta == -1)
                     {
@@ -261,13 +261,15 @@ CLIENTE cadastraCliente()
         return C;
     }
 
-    char nome[100];
+    char nome[nome_size];
     printf("Nome: ");
     fgets(nome, sizeof(nome), stdin);
+    nome[strcspn(nome, "\n")] = 0;
 
-    char CPF_CNPJ[20];
+    char CPF_CNPJ[CPF_CNPJ_size];
     printf("CPF/CNPJ: ");
     fgets(CPF_CNPJ, sizeof(CPF_CNPJ), stdin);
+    CPF_CNPJ[strcspn(CPF_CNPJ, "\n")] = 0;
 
     for(int i = 0; i < clientes_registrados; i++)
     {
@@ -278,10 +280,10 @@ CLIENTE cadastraCliente()
         }
     }
 
-    char codigo[5];
+    char codigo[codigo_size];
     printf("Codigo: ");
     fgets(codigo, sizeof(codigo), stdin); 
-    getchar();
+    codigo[strcspn(codigo, "\n")] = 0;
 
     for(int i = 0; i < clientes_registrados; i++)
     {
@@ -293,13 +295,15 @@ CLIENTE cadastraCliente()
         }
     }
 
-    char telefone[20];
+    char telefone[telefone_size];
     printf("Telefone: ");
     fgets(telefone, sizeof(telefone), stdin);
+    telefone[strcspn(telefone, "\n")] = 0;
 
-    char endereco[100];
+    char endereco[endereco_size];
     printf("Endereço: ");
     fgets(endereco, sizeof(endereco), stdin);
+    endereco[strcspn(endereco, "\n")] = 0;
 
     strcpy(C.codigo, codigo);
     strcpy(C.nome, nome);
@@ -347,15 +351,8 @@ void listaClientes()
 
     for (int i = 0; i < clientes_registrados; i++)
     {
-        // Valores obtidos com o fgets() ficam com o ENTER final
-        printf("----- CLIENTE %d -----\n"
-               "Nome: %s"
-               "CPF/CNPJ: %s"
-               "Codigo: %s\n"
-               "Telefone: %s"
-               "Endereço: %s"
-               "---------------------\n",
-               i + 1, cliente[i].nome, cliente[i].CPF_CNPJ, cliente[i].codigo, cliente[i].telefone, cliente[i].endereco);
+        printf("----- CLIENTE %d -----\n", i+1);
+        imprimeCliente(cliente[i]);
     }
 }
 
@@ -400,12 +397,13 @@ int atualizaCliente(int indice)
     char escolha = '0';
     printf("São esses o nome e CPF/CNPJ do cliente que vc deseja atualizar?(S/N)\n"
            " - %s"
-           " - %s",
+           " - %s\n"
+           "->",
            cliente[indice].nome, cliente[indice].CPF_CNPJ);
     while (escolha != 'N' && escolha != 'S')
     {
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         switch (escolha)
         {
@@ -430,12 +428,12 @@ int atualizaCliente(int indice)
 int excluiCliente(int indice)
 {
     char escolha = '0';
-    printf("Esse é o cliente a ser excluído?(S/N)\n");
+    printf("Esse é o cliente a ser excluído?(S/N)\n-> ");
     imprimeCliente(cliente[indice]);
     while (escolha != 'S')
     {
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha == 'N')
             return 0;
@@ -455,11 +453,11 @@ int excluiCliente(int indice)
 void imprimeCliente(CLIENTE C)
 {
     printf("----------------------\n"
-           "Nome: %s"
-           "CPF/CNPJ: %s"
+           "Nome: %s\n"
+           "CPF/CNPJ: %s\n"
            "Codigo: %s\n"
-           "Telefone: %s"
-           "Endereço: %s"
+           "Telefone: %s\n"
+           "Endereço: %s\n"
            "---------------------\n",
            C.nome, C.CPF_CNPJ, C.codigo, C.telefone, C.endereco);
 }
@@ -478,7 +476,7 @@ char imprimeBemVindo()
                "T - Gerenciar Contas\n"
                "S - Sair\n-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'C' && escolha != 'T' && escolha != 'S')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -503,7 +501,7 @@ char imprimeGerenciarClientes()
                "S - Sair\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -525,7 +523,7 @@ char imprimeMenuBusca()
                "D - CPF/CNPJ\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'N' && escolha != 'C' && escolha != 'D')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -546,7 +544,7 @@ char imprimeMenuEscolhaCodOuCPF_CNPJ()
                "D - CPF/CNPJ\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'C' && escolha != 'D')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -577,7 +575,7 @@ char imprimeGerenciarContas()
                "S - Sair\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'R' && escolha != 'C' && escolha != 'L' && escolha != 'W' && escolha != 'D' && escolha != 'T' && escolha != 'E' && escolha != 'S')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -605,7 +603,7 @@ void cadastraConta()
     int aux = 0;
     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
     scanf("%s", &string);
-    getchar();
+    while(getchar() != '\n');
     indexCliente = buscaClientes(escolha, string);
     if(indexCliente == -1)
     {
@@ -631,12 +629,10 @@ void cadastraConta()
 
     printf("Insira a agência: ");
     scanf("%d", &cliente[indexCliente].conta[aux].agencia);
-    //getchar();
     while(getchar() != '\n');
 
     printf("Insira o número da conta: ");
     scanf("%d", &cliente[indexCliente].conta[aux].numeroConta);
-    //getchar()
     while(getchar() != '\n');
 
     cliente[indexCliente].conta[aux].codConta = (cliente[indexCliente].conta[aux].agencia * 1000) + cliente[indexCliente].conta[aux].numeroConta;
@@ -768,9 +764,10 @@ void realizarSaque(CONTA *conta, double valor)
     }
 
     conta->saldo -= valor;
-    char descricao[100];
+    char descricao[descricao_size];
     printf("Insira uma descrição para a sua transacao: ");
     fgets(descricao, sizeof(descricao), stdin);
+    descricao[strcspn(descricao, "\n")] = 0;
     criaTransacao(conta->codConta, 'D', valor, descricao);
 
     printf("Saque realizado\nForam entregues: \n");
@@ -818,9 +815,10 @@ void realizaDeposito(CONTA *conta, double valor)
     }
 
     conta->saldo += valor;
-    char descricao[100];
+    char descricao[descricao_size];
     printf("Insira uma descrição para a sua transacao: ");
     fgets(descricao, sizeof(descricao), stdin);
+    descricao[strcspn(descricao, "\n")] = 0;
     criaTransacao(conta->codConta, 'C', valor, descricao);
     printf("Depósito realizado\n");
     printf("Saldo final: %.2lf\n", conta->saldo);
@@ -906,6 +904,7 @@ void exibeExtrato(int codigo)
     int qtdDias = 0;
     printf("Insira a quantidade de dias: ");
     scanf("%d", &qtdDias);
+    while(getchar() != '\n');
     time_t agora;
     agora = time(NULL);
     struct tm* hoje;
