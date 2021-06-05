@@ -9,6 +9,8 @@
 
 #define SIZE 100
 
+bool eInteiro(double n);
+
 CLIENTE cliente[SIZE];
 int clientes_registrados = 0;
 
@@ -132,7 +134,6 @@ int main()
                         printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
                         printf("\nInsira o valor a ser sacado: ");
                         scanf("%lf", &valor);
-                        getchar();
                         while(getchar() != '\n');
 
                         realizarSaque(&cliente[indexCliente].conta[indexConta], valor);
@@ -156,11 +157,11 @@ int main()
                     } else 
                     {
                         double valor = 0;
+                        imprimeCliente(cliente[indexCliente]);
                         printf("Conta: %i-%i\n", cliente[indexCliente].conta[indexConta].agencia, cliente[indexCliente].conta[indexConta].numeroConta);
                         printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
                         printf("\nInsira o valor a ser depositado: ");
                         scanf("%lf", &valor);
-                        //getchar();
                         while(getchar() != '\n');
 
                         realizaDeposito(&cliente[indexCliente].conta[indexConta], valor);
@@ -188,7 +189,9 @@ int main()
                     {
                         // O cliente da conta origem existe, portanto seus dados são imprimidos
                         imprimeCliente(cliente[indexClienteOrigem]);
-                        imprimeUmaConta(cliente[indexClienteOrigem].conta[indexContaOrigem]);
+                        printf("Conta: %i-%i\n", cliente[indexClienteOrigem].conta[indexContaOrigem].agencia, cliente[indexClienteOrigem].conta[indexContaOrigem].numeroConta);
+                        printf("Saldo atual: %.2lf\n", cliente[indexClienteOrigem].conta[indexContaOrigem].saldo);
+                        // imprimeUmaConta(cliente[indexClienteOrigem].conta[indexContaOrigem]);
 
                         printf(" Conta Destino \n");
                         printf("Insira a agencia: ");
@@ -205,7 +208,9 @@ int main()
                         {
                             // O cliente da conta destino exite, portanto seus dados são imprimidos
                             imprimeCliente(cliente[indexClienteDestino]);
-                            imprimeUmaConta(cliente[indexClienteDestino].conta[indexContaDestino]);
+                            printf("Conta: %i-%i\n", cliente[indexClienteDestino].conta[indexContaDestino].agencia, cliente[indexClienteDestino].conta[indexContaDestino].numeroConta);
+                            printf("Saldo atual: %.2lf\n", cliente[indexClienteDestino].conta[indexContaDestino].saldo);
+                            // imprimeUmaConta(cliente[indexClienteDestino].conta[indexContaDestino]);
 
                             realizaTransferencia(&cliente[indexClienteOrigem].conta[indexContaOrigem], &cliente[indexClienteDestino].conta[indexContaDestino]);
                         }
@@ -719,24 +724,87 @@ void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta
     *indexCliente = -1;
 }
 
+bool eInteiro(double n)
+{
+    int truncado = (int)n;
+    return(n == truncado);
+}
+
 void realizarSaque(CONTA *conta, double valor)
 {
+    if(valor <= 0)
+    {
+        printf("Valor inválido\nValores nulos ou negativos não são permitidos\n");
+        return;
+    }
     if(conta->saldo < valor)
     {
         printf("Saldo insuficiente\n");
         return;
     }
-    //TODO
+    if(!eInteiro(valor))
+    {
+        printf("Valor inválido\nSó são aceitos valores inteiros\n");
+        return;
+    }
+
+    int notas = (int)valor;
+
+    int aux = notas;
+
+    aux = notas;
+    aux = (aux % 200);
+    aux = (aux % 100);
+    aux = (aux % 50);
+    aux = (aux % 20);
+    aux = (aux % 10);
+    aux = (aux % 5);
+    aux = (aux % 2);
+
+    if(aux > 0)
+    {
+        printf("Valor inválido\nSó são aceitos valores que podem ser distribuídos entre as seguintes notas: R$ 200,00, R$ 100,00, R$ 50,00, R$ 20,00, R$ 10,00, R$ 5,00, R$ 2,00.\n");
+        return;
+    }
 
     conta->saldo -= valor;
     char descricao[100];
     printf("Insira uma descrição para a sua transacao: ");
     fgets(descricao, sizeof(descricao), stdin);
     criaTransacao(conta->codConta, 'D', valor, descricao);
+
+    printf("Saque realizado\nForam entregues: \n");
+
+    aux = notas;
+
+    if(aux / 200 != 0)
+        printf("%d nota(s) de R$ 200,00\n", aux / 200);
+    aux = (aux % 200);
+
+    if(aux / 100 != 0)
+        printf("%d nota(s) de R$ 100,00\n", aux / 100);
+    aux = (aux % 100);
+
+    if(aux / 50 != 0)
+        printf("%d nota(s) de R$ 50,00\n", aux / 50);
+    aux = (aux % 50);
+
+    if(aux / 20 != 0)
+        printf("%d nota(s) de R$ 20,00\n", aux / 20);
+    aux = (aux % 20);
+
+    if(aux / 10 != 0)
+        printf("%d nota(s) de R$ 10,00\n", aux / 10);
+    aux = (aux % 10);
+
+    if(aux / 5 != 0)
+        printf("%d nota(s) de R$ 5,00\n", aux / 5);
+    aux = (aux % 5);
+
+    if(aux / 2 != 0)
+        printf("%d nota(s) de R$ 2,00\n", aux / 2);
+
     
-
-
-    printf("Saque realizado\n");
     printf("Saldo final: %.2lf\n", conta->saldo);
 
 }
@@ -776,10 +844,16 @@ void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
         return;
     }
 
+    char desc[34];
+
     contaOrigem->saldo -= valor;
-    criaTransacao(contaOrigem->codConta, 'D', valor, "Descricao conta origem");
+    snprintf(desc, sizeof(desc), "Transferência para conta: %d-%d", contaDestino->agencia, contaDestino->numeroConta);
+    criaTransacao(contaOrigem->codConta, 'D', valor, desc);
+
     contaDestino->saldo += valor;
-    criaTransacao(contaDestino->codConta, 'C', valor, "Descricao conta destino");
+    snprintf(desc, sizeof(desc), "Transferência de conta: %d-%d", contaOrigem->agencia, contaOrigem->numeroConta);
+    criaTransacao(contaDestino->codConta, 'C', valor, desc);
+
     printf("Transferencia realizada\n");
 }
 
