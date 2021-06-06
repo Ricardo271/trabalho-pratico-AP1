@@ -20,7 +20,6 @@ int transacoes_realizadas = 0;
 int main()
 {
 
-
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
     {
@@ -917,3 +916,6 @@ void exibeExtrato(int codigo)
         }
     }
 }
+
+/* -- Arquivos -- */
+
