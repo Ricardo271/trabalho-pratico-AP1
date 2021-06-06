@@ -9,7 +9,17 @@
 
 #define SIZE 100
 
+/* -- Formatos de salvamento -- */
+const char *FORMATO_ENTRADA = "{\"cod\": \"%[^\"]\", \"nome\": \"%[^\"]\", \"CPF_CNPJ\": \"%[^\"]\", \"tele\": \"%[^\"]\", \"end\": \"%[^\"]\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}";
+const char *FORMATO_SAIDA   = "{\"cod\": \"%s\", \"nome\": \"%s\", \"CPF_CNPJ\": \"%s\", \"tele\": \"%s\", \"end\": \"%s\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}\n";
+
+/* -- Prototipos -- */
+
 bool eInteiro(double n);
+void leClientes(char arquivo[]);
+void escreveClientes(char arquivo[]);
+void leTransacoes(char arquivo[], TRANSACAO T);
+void escreveTransacoes(char arquivo[], TRANSACAO T);
 
 CLIENTE cliente[SIZE];
 int clientes_registrados = 0;
@@ -19,6 +29,7 @@ int transacoes_realizadas = 0;
 
 int main()
 {
+    leClientes("Clientes.txt");
 
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
@@ -245,6 +256,12 @@ int main()
         }
         escolha = imprimeBemVindo();
     }
+
+    if (clientes_registrados > 0)
+    {
+        organizaClientes();
+    }
+    escreveClientes("Clientes.txt");
 }
 
 /* -- CLIENTES -- */
@@ -310,6 +327,9 @@ CLIENTE cadastraCliente()
     strcpy(C.telefone, telefone);
     strcpy(C.endereco, endereco);
     C.contas_registradas = 0;
+
+    C.conta[0].codConta = 0;
+    C.conta[1].codConta = 0;
 
     clientes_registrados++;
     return C;
@@ -919,3 +939,46 @@ void exibeExtrato(int codigo)
 
 /* -- Arquivos -- */
 
+void leClientes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "r");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um errro durante a abertura do arquivo para leitura ou o arquivo não existe\n");
+        return;
+    }
+
+    char buffer[200];
+    fgets(buffer, 200, fp);
+
+    int i = 0;
+    while(!feof(fp))
+    {
+        CLIENTE *c = cliente + i;
+        sscanf(buffer, FORMATO_ENTRADA, c->codigo, c->nome, c->CPF_CNPJ, c->telefone, c->endereco, &c->contas_registradas, &c->conta[0].codConta, &c->conta[1].codConta);
+        clientes_registrados++;
+        i++;
+        fgets(buffer, 200, fp);
+    }
+
+    fclose(fp);
+}
+
+void escreveClientes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "w");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um erro durante a abertura do arquivo para gravação\n");
+        return;
+    }
+
+    for(int index = 0; index < clientes_registrados; index++)
+    {
+        fprintf(fp, FORMATO_SAIDA, cliente[index].codigo, cliente[index].nome, cliente[index].CPF_CNPJ, cliente[index].telefone, cliente[index].endereco, cliente[index].conta[0].codConta, cliente[index].conta[1].codConta);
+    }
+
+    fclose(fp);
+}
