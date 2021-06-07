@@ -40,9 +40,7 @@ int main()
 {
     leClientes("Clientes.txt");
     leContas("Contas.txt");
-    printf("aqui\n");
-    leTransacoes("Transacoes.txt");
-    printf("aqui\n");
+    //leTransacoes("Transacoes.txt");
 
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
