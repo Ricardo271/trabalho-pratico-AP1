@@ -10,16 +10,25 @@
 #define SIZE 100
 
 /* -- Formatos de salvamento -- */
-const char *FORMATO_ENTRADA = "{\"cod\": \"%[^\"]\", \"nome\": \"%[^\"]\", \"CPF_CNPJ\": \"%[^\"]\", \"tele\": \"%[^\"]\", \"end\": \"%[^\"]\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}";
-const char *FORMATO_SAIDA   = "{\"cod\": \"%s\", \"nome\": \"%s\", \"CPF_CNPJ\": \"%s\", \"tele\": \"%s\", \"end\": \"%s\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}\n";
+const char *FORMATO_ENTRADA_CLIENTES = "{\"cod\": \"%[^\"]\", \"nome\": \"%[^\"]\", \"CPF_CNPJ\": \"%[^\"]\", \"tele\": \"%[^\"]\", \"end\": \"%[^\"]\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}";
+const char *FORMATO_SAIDA_CLIENTES   = "{\"cod\": \"%s\", \"nome\": \"%s\", \"CPF_CNPJ\": \"%s\", \"tele\": \"%s\", \"end\": \"%s\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}\n";
+
+const char *FORMATO_ENTRADA_CONTAS = "{\"cod\": \"%d\", \"agencia\": \"%d\", \"numero\": \"%d\", \"saldo\": \"%lf\"}";
+const char *FORMATO_SAIDA_CONTAS   = "{\"cod\": \"%d\", \"agencia\": \"%d\", \"numero\": \"%d\", \"saldo\": \"%lf\"}\n";
+
+const char *FORMATO_ENTRADA_TRANSACOES = "{\"cod\": \"%d\", \"debito\": \"%d\", \"credito\": \"%d\", \"valor\": \"%lf\", \"dia\": \"%d\", \"mes\": \"%d\", \"ano\": \"%d\", \"desc\": \"%[^\"]\"}";
+const char *FORMATO_SAIDA_TRANSACOES   = "{\"cod\": \"%d\", \"debito\": \"%d\", \"credito\": \"%d\", \"valor\": \"%lf\", \"dia\": \"%d\", \"mes\": \"%d\", \"ano\": \"%d\", \"desc\": \"%s\"}\n";
+
 
 /* -- Prototipos -- */
 
 bool eInteiro(double n);
 void leClientes(char arquivo[]);
 void escreveClientes(char arquivo[]);
-void leTransacoes(char arquivo[], TRANSACAO T);
-void escreveTransacoes(char arquivo[], TRANSACAO T);
+void leContas(char arquivo[]);
+void escreveContas(char arquivo[]);
+void leTransacoes(char arquivo[]);
+void escreveTransacoes(char arquivo[]);
 
 CLIENTE cliente[SIZE];
 int clientes_registrados = 0;
@@ -30,6 +39,10 @@ int transacoes_realizadas = 0;
 int main()
 {
     leClientes("Clientes.txt");
+    leContas("Contas.txt");
+    printf("aqui\n");
+    leTransacoes("Transacoes.txt");
+    printf("aqui\n");
 
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
@@ -42,6 +55,8 @@ int main()
                 if (escolha == 'C')
                 {
                     cliente[clientes_registrados] = cadastraCliente();
+                    //cliente[clientes_registrados-1].conta[0].codConta = 0;
+                    //cliente[clientes_registrados-1].conta[1].codConta = 0;
                 }
                 else if (escolha == 'L')
                 {
@@ -262,6 +277,8 @@ int main()
         organizaClientes();
     }
     escreveClientes("Clientes.txt");
+    escreveContas("Contas.txt");
+    escreveTransacoes("Transacoes.txt");
 }
 
 /* -- CLIENTES -- */
@@ -304,7 +321,7 @@ CLIENTE cadastraCliente()
     for(int i = 0; i < clientes_registrados; i++)
     {
 
-        if(codigo == cliente[i].codigo)
+        if(!strcmp(codigo, cliente[i].codigo))
         {
             printf("Cliente já cadastrado\n");
             return C;
@@ -883,6 +900,13 @@ void criaTransacao(int codConta, char operacao, double valor, char descricao[])
     {
         transacao = (TRANSACAO *) realloc(transacao, sizeof(TRANSACAO) * (transacoes_realizadas + 1));
     }
+
+    if(transacao == NULL)
+    {
+        printf("Falha de alocação de memória para transacao\n");
+        return;
+    }
+
     strcpy(transacao[transacoes_realizadas].descricao, descricao);
 
     if(operacao == 'C')
@@ -949,17 +973,17 @@ void leClientes(char arquivo[])
         return;
     }
 
-    char buffer[200];
-    fgets(buffer, 200, fp);
+    char buffer[250];
+    fgets(buffer, 250, fp);
 
     int i = 0;
     while(!feof(fp))
     {
         CLIENTE *c = cliente + i;
-        sscanf(buffer, FORMATO_ENTRADA, c->codigo, c->nome, c->CPF_CNPJ, c->telefone, c->endereco, &c->contas_registradas, &c->conta[0].codConta, &c->conta[1].codConta);
+        sscanf(buffer, FORMATO_ENTRADA_CLIENTES, c->codigo, c->nome, c->CPF_CNPJ, c->telefone, c->endereco, &c->contas_registradas, &c->conta[0].codConta, &c->conta[1].codConta);
         clientes_registrados++;
         i++;
-        fgets(buffer, 200, fp);
+        fgets(buffer, 250, fp);
     }
 
     fclose(fp);
@@ -977,7 +1001,127 @@ void escreveClientes(char arquivo[])
 
     for(int index = 0; index < clientes_registrados; index++)
     {
-        fprintf(fp, FORMATO_SAIDA, cliente[index].codigo, cliente[index].nome, cliente[index].CPF_CNPJ, cliente[index].telefone, cliente[index].endereco, cliente[index].conta[0].codConta, cliente[index].conta[1].codConta);
+        fprintf(fp, FORMATO_SAIDA_CLIENTES, cliente[index].codigo, cliente[index].nome, cliente[index].CPF_CNPJ, cliente[index].telefone, cliente[index].endereco, cliente[index].contas_registradas, cliente[index].conta[0].codConta, cliente[index].conta[1].codConta);
+    }
+
+    fclose(fp);
+}
+
+void leContas(char arquivo[])
+{   
+    FILE *fp;
+    fp = fopen(arquivo, "r");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um errro durante a abertura do arquivo para leitura ou o arquivo não existe\n");
+        return;
+    }
+
+    char buffer[100];
+    fgets(buffer, 100, fp);
+
+
+    while(!feof(fp))
+    {
+        CONTA c;
+        sscanf(buffer, FORMATO_ENTRADA_CONTAS, &c.codConta, &c.agencia, &c.numeroConta, &c.saldo);
+        for(int i = 0; i < clientes_registrados; i++)
+        {
+            for(int j = 0; j < cliente[i].contas_registradas; j++)
+            {
+                if(cliente[i].conta[j].codConta == c.codConta)
+                {
+                    cliente[i].conta[j] = c;
+                }
+            }
+        }
+        fgets(buffer, 100, fp);
+    }
+    
+    fclose(fp);
+}
+
+void escreveContas(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "w");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um erro durante a abertura do arquivo");
+        return;
+    }
+
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        for(int j = 0; j < cliente[i].contas_registradas; j++)
+        {
+            fprintf(fp, FORMATO_SAIDA_CONTAS, cliente[i].conta[j].codConta, cliente[i].conta[j].agencia, cliente[i].conta[j].numeroConta, cliente[i].conta[j].saldo);
+        }
+    }
+     
+    fclose(fp);
+}
+
+void leTransacoes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "r");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um errro durante a abertura do arquivo para leitura ou o arquivo não existe\n");
+        return;
+    }
+
+    char buffer[250];
+    fgets(buffer, 250, fp);
+
+    printf("aqui\n");
+    int i = 0;
+    while(!feof(fp))
+    {
+        TRANSACAO *t = transacao + i;
+        printf("aqui12\n");
+
+        if(transacoes_realizadas == 0)
+        {
+            transacao = (TRANSACAO *) malloc(sizeof(TRANSACAO));
+            printf("aqui13\n");
+        } else
+        {
+            transacao = (TRANSACAO *) realloc(transacao, sizeof(TRANSACAO) * (transacoes_realizadas + 1));
+            printf("aqui15\n");
+        }
+
+        if(transacao == NULL)
+        {
+            printf("Falha de alocação de memória para transacao\n");
+            return;
+        }
+
+        printf("aqui17\n");
+        sscanf(buffer, FORMATO_ENTRADA_TRANSACOES, &t->codConta, &t->debito, &t->credito, &t->valor, &t->data->tm_mday, &t->data->tm_mon, &t->data->tm_year, t->descricao);
+        printf("aqui\n");
+        transacoes_realizadas++;
+        i++;
+        fgets(buffer, 250, fp);
+    }
+    
+    fclose(fp);
+}
+
+void escreveTransacoes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "w");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um erro durante a abertura do arquivo para gravação\n");
+        return;
+    }
+
+    for(int index = 0; index < transacoes_realizadas; index++)
+    {
+        fprintf(fp, FORMATO_SAIDA_TRANSACOES, transacao[index].codConta, transacao[index].debito, transacao[index].credito, transacao[index].valor, transacao[index].data->tm_mday, transacao[index].data->tm_mon, transacao[index].data->tm_year, transacao[index].descricao);
     }
 
     fclose(fp);
