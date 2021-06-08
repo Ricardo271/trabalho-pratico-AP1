@@ -7,6 +7,8 @@
 #include "contas.h"
 #include "transacoes.h"
 
+#define clear printf("\e[1;1H\e[2J"); // "Limpa" o terminal
+
 #define SIZE 100
 
 /* -- Formatos de salvamento -- */
