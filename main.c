@@ -53,8 +53,6 @@ int main()
                 if (escolha == 'C')
                 {
                     cliente[clientes_registrados] = cadastraCliente();
-                    //cliente[clientes_registrados-1].conta[0].codConta = 0;
-                    //cliente[clientes_registrados-1].conta[1].codConta = 0;
                 }
                 else if (escolha == 'L')
                 {
@@ -347,6 +345,7 @@ CLIENTE cadastraCliente()
     C.conta[1].codConta = 0;
 
     clientes_registrados++;
+    printf("\nCliente Cadastrado\n\n");
     return C;
 }
 
@@ -462,10 +461,11 @@ int atualizaCliente(int indice)
 int excluiCliente(int indice)
 {
     char escolha = '0';
-    printf("Esse é o cliente a ser excluído?(S/N)\n-> ");
+    printf("Esse é o cliente a ser excluído?(S/N)\n ");
     imprimeCliente(cliente[indice]);
     while (escolha != 'S')
     {
+        printf("-> ");
         scanf("%c", &escolha);
         while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
@@ -658,7 +658,6 @@ void cadastraConta()
         return;
     }
 
-    //TODO: deletar depois
     printf("Cadastrando na 'conta[%d]' do cliente %s\n", aux, cliente[indexCliente].nome);
 
     printf("Insira a agência: ");
@@ -677,6 +676,7 @@ void cadastraConta()
     printf("Conta cadastrada\n");
 }
 
+// Essa função organiza as contas por odem alfabética
 void organizaContas(CLIENTE *C)
 {
     CONTA temp;
@@ -737,6 +737,8 @@ void imprimeUmaConta(CONTA CNT)
     printf("-------------------------------\n");
 }
 
+// Essa função recebe a agencia e o numeroConta de uma conta e modifica os dois ponteiros indexCliente e indexConta de onde essa conta foi encontrada
+// Caso nehuma conta seja encontrada o index do cliente é modificado para -1 
 void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta)
 {
     for(int i = 0; i < clientes_registrados; i++)
@@ -754,6 +756,7 @@ void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta
     *indexCliente = -1;
 }
 
+// Essa função checa se um númeor é inteiro
 bool eInteiro(double n)
 {
     int truncado = (int)n;
@@ -959,7 +962,7 @@ void exibeExtrato(int codigo)
     }
 }
 
-/* -- Arquivos -- */
+/* -- ARQUIVOS -- */
 
 void leClientes(char arquivo[])
 {
@@ -1060,6 +1063,8 @@ void escreveContas(char arquivo[])
     fclose(fp);
 }
 
+// Eu não consegui implementar a função para ler as transações do arquivo
+// no momento ela causa Falha de segmentação
 void leTransacoes(char arquivo[])
 {
     FILE *fp;
