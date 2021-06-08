@@ -2,7 +2,6 @@
 #define CONTAS
 
 #include "clientes.h"
-#include "transacoes.h"
 
 typedef struct _CONTA
 {
@@ -18,10 +17,14 @@ void listaTodasContas();
 
 void imprimeContas();
 
+void imprimeUmaConta();
+
 void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta);
 
-CONTA realizarSaque(CONTA conta);
+void realizarSaque(CONTA *conta, double valor);
 
-CONTA realizaDeposito(CONTA conta);
+void realizaDeposito(CONTA *conta, double valor);
+
+void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino);
 
 #endif // CONTAS

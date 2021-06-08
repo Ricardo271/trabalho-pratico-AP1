@@ -1,12 +1,36 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "clientes.h"
 #include "menus.h"
 #include "contas.h"
 #include "transacoes.h"
 
+#define clear printf("\e[1;1H\e[2J"); // "Limpa" o terminal
+
 #define SIZE 100
+
+/* -- Formatos de salvamento -- */
+const char *FORMATO_ENTRADA_CLIENTES = "{\"cod\": \"%[^\"]\", \"nome\": \"%[^\"]\", \"CPF_CNPJ\": \"%[^\"]\", \"tele\": \"%[^\"]\", \"end\": \"%[^\"]\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}";
+const char *FORMATO_SAIDA_CLIENTES   = "{\"cod\": \"%s\", \"nome\": \"%s\", \"CPF_CNPJ\": \"%s\", \"tele\": \"%s\", \"end\": \"%s\", \"contas_registradas\": \"%d\", \"conta_1\": \"%d\", \"conta_2\": \"%d\"}\n";
+
+const char *FORMATO_ENTRADA_CONTAS = "{\"cod\": \"%d\", \"agencia\": \"%d\", \"numero\": \"%d\", \"saldo\": \"%lf\"}";
+const char *FORMATO_SAIDA_CONTAS   = "{\"cod\": \"%d\", \"agencia\": \"%d\", \"numero\": \"%d\", \"saldo\": \"%lf\"}\n";
+
+const char *FORMATO_ENTRADA_TRANSACOES = "{\"cod\": \"%d\", \"debito\": \"%d\", \"credito\": \"%d\", \"valor\": \"%lf\", \"dia\": \"%d\", \"mes\": \"%d\", \"ano\": \"%d\", \"desc\": \"%[^\"]\"}";
+const char *FORMATO_SAIDA_TRANSACOES   = "{\"cod\": \"%d\", \"debito\": \"%d\", \"credito\": \"%d\", \"valor\": \"%lf\", \"dia\": \"%d\", \"mes\": \"%d\", \"ano\": \"%d\", \"desc\": \"%s\"}\n";
+
+
+/* -- Prototipos -- */
+
+bool eInteiro(double n);
+void leClientes(char arquivo[]);
+void escreveClientes(char arquivo[]);
+void leContas(char arquivo[]);
+void escreveContas(char arquivo[]);
+void leTransacoes(char arquivo[]);
+void escreveTransacoes(char arquivo[]);
 
 CLIENTE cliente[SIZE];
 int clientes_registrados = 0;
@@ -14,12 +38,11 @@ int clientes_registrados = 0;
 TRANSACAO *transacao;
 int transacoes_realizadas = 0;
 
-//TODO: colocar esse protótipo em algum dos arquivos .h
-void carregaClientes();
-
 int main()
 {
-    carregaClientes();
+    leClientes("Clientes.txt");
+    leContas("Contas.txt");
+    //leTransacoes("Transacoes.txt");
 
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
@@ -32,7 +55,6 @@ int main()
                 if (escolha == 'C')
                 {
                     cliente[clientes_registrados] = cadastraCliente();
-                    clientes_registrados++;
                 }
                 else if (escolha == 'L')
                 {
@@ -44,10 +66,10 @@ int main()
                     printf("Insira o Termo de busca: ");
                     char string[100];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux = buscaClientes(escolha, string);
                     if (aux == -1)
-                        printf("\nNenhum cliente foi encontrado.\n\n");
+                        printf("\nNenhum cliente foi encontrado com esses parâmetros.\n\n");
                     else
                         imprimeCliente(cliente[aux]);
                 }
@@ -56,7 +78,7 @@ int main()
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux = atualizaCliente(buscaClientes(escolha, string));
                     if (aux == 1)
                         printf("O cliente foi atualizado com sucesso\n");
@@ -64,18 +86,16 @@ int main()
                         printf("A atualização foi cancelada\n");
                     else if (aux == -1)
                         printf("Cliente não encontrado\n");
-                    else if (aux == -2)
-                        printf("Ocorreu um erro durante a atualização do cliente\n");
                 }
                 else if (escolha == 'E')
                 {
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux = excluiCliente(buscaClientes(escolha, string));
                     if (aux == 0)
-                        printf("A operação de exculsão foi cancelada\n");
+                        printf("A operação de exclusão foi cancelada\n");
                     else if (aux == 1) 
                     {
                         printf("O cliente foi excluído\n");
@@ -104,7 +124,7 @@ int main()
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
                     scanf("%s", &string);
-                    getchar();
+                    while(getchar() != '\n');
                     int aux;
                     aux = buscaClientes(escolha, string);
                     if(aux == -1)
@@ -122,39 +142,124 @@ int main()
                     int indexConta = 0;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
+                    while(getchar() != '\n');
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
+                    while(getchar() != '\n');
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexCliente == -1)
                     {
                         printf("Cliente não encontrado\n");
                     } else{
-                        cliente[indexCliente].conta[indexConta] = realizarSaque(cliente[indexCliente].conta[indexConta]);
+                        double valor;
+                        imprimeCliente(cliente[indexCliente]);
+                        printf("Conta: %i-%i\n", cliente[indexCliente].conta[indexConta].agencia, cliente[indexCliente].conta[indexConta].numeroConta);
+                        printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
+                        printf("\nInsira o valor a ser sacado: ");
+                        scanf("%lf", &valor);
+                        while(getchar() != '\n');
+
+                        realizarSaque(&cliente[indexCliente].conta[indexConta], valor);
                     }
                 } else if (escolha == 'D')
                 {
                     int agencia = 0;
                     int numeroConta = 0;
-                    int indexCliente = 0;
-                    int indexConta = 0;
+                    int indexCliente = -1;
+                    int indexConta = -1;
                     printf("Insira a agencia: ");
                     scanf("%d", &agencia);
+                    while(getchar() != '\n');
                     printf("Insira o número da conta: ");
                     scanf("%d", &numeroConta);
+                    while(getchar() != '\n');
                     buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
                     if(indexCliente == -1)
                     {
                         printf("Cliente não encontrado\n");
                     } else 
                     {
-                        cliente[indexCliente].conta[indexConta] = realizaDeposito(cliente[indexCliente].conta[indexConta]);
+                        double valor = 0;
+                        imprimeCliente(cliente[indexCliente]);
+                        printf("Conta: %i-%i\n", cliente[indexCliente].conta[indexConta].agencia, cliente[indexCliente].conta[indexConta].numeroConta);
+                        printf("Saldo atual: %.2lf\n", cliente[indexCliente].conta[indexConta].saldo);
+                        printf("\nInsira o valor a ser depositado: ");
+                        scanf("%lf", &valor);
+                        while(getchar() != '\n');
+
+                        realizaDeposito(&cliente[indexCliente].conta[indexConta], valor);
                     }
                 } else if (escolha == 'T')
                 {
+                    int indexClienteOrigem = -1;
+                    int indexContaOrigem = -1;
+                    int indexClienteDestino = -1;
+                    int indexContaDestino = -1;
+                    int agencia = 0;
+                    int numeroConta = 0;
+                    printf(" Conta Origem \n");
+                    printf("Insira a agencia: ");
+                    scanf("%d", &agencia);
+                    while(getchar() != '\n');
+                    printf("Insira o numero da conta: ");
+                    scanf("%d", &numeroConta);
+                    while(getchar() != '\n');
+                    buscaConta(agencia, numeroConta, &indexClienteOrigem, &indexContaOrigem);
+                    if(indexClienteOrigem == -1)
+                    {
+                        printf("Conta de origem não encontrada\n");
+                    } else
+                    {
+                        // O cliente da conta origem existe, portanto seus dados são imprimidos
+                        imprimeCliente(cliente[indexClienteOrigem]);
+                        printf("Conta: %i-%i\n", cliente[indexClienteOrigem].conta[indexContaOrigem].agencia, cliente[indexClienteOrigem].conta[indexContaOrigem].numeroConta);
+                        printf("Saldo atual: %.2lf\n", cliente[indexClienteOrigem].conta[indexContaOrigem].saldo);
+                        // imprimeUmaConta(cliente[indexClienteOrigem].conta[indexContaOrigem]);
 
+                        printf(" Conta Destino \n");
+                        printf("Insira a agencia: ");
+                        scanf("%d", &agencia);
+                        while(getchar() != '\n');
+                        printf("Insira o numero da conta: ");
+                        scanf("%d", &numeroConta);
+                        while(getchar() != '\n');
+                        buscaConta(agencia, numeroConta, &indexClienteDestino, &indexContaDestino);
+                        if(indexClienteDestino == -1)
+                        {
+                            printf("Conta de destino não encontrada\n");
+                        } else
+                        {
+                            // O cliente da conta destino exite, portanto seus dados são imprimidos
+                            imprimeCliente(cliente[indexClienteDestino]);
+                            printf("Conta: %i-%i\n", cliente[indexClienteDestino].conta[indexContaDestino].agencia, cliente[indexClienteDestino].conta[indexContaDestino].numeroConta);
+                            printf("Saldo atual: %.2lf\n", cliente[indexClienteDestino].conta[indexContaDestino].saldo);
+                            // imprimeUmaConta(cliente[indexClienteDestino].conta[indexContaDestino]);
+
+                            realizaTransferencia(&cliente[indexClienteOrigem].conta[indexContaOrigem], &cliente[indexClienteDestino].conta[indexContaDestino]);
+                        }
+                    }
                 } else if (escolha == 'E')
                 {
-
+                    int agencia = 0;
+                    int numeroConta = 0;
+                    int indexCliente = -1;
+                    int indexConta = -1;
+                    printf("Insira a agencia: ");
+                    scanf("%d", &agencia);
+                    while(getchar() != '\n');
+                    printf("Insira o número da conta: ");
+                    scanf("%d", &numeroConta);
+                    while(getchar() != '\n');
+                    buscaConta(agencia, numeroConta, &indexCliente, &indexConta);
+                    if(indexConta == -1)
+                    {
+                        printf("Conta não encontrada\n");
+                    } else
+                    {
+                        imprimeCliente(cliente[indexCliente]);
+                        imprimeUmaConta(cliente[indexCliente].conta[indexConta]);
+                        exibeExtrato(cliente[indexCliente].conta[indexConta].codConta);
+                    }
                 }
 
                 // Reseta a escolha
@@ -164,77 +269,125 @@ int main()
         }
         escolha = imprimeBemVindo();
     }
+
+    if (clientes_registrados > 0)
+    {
+        organizaClientes();
+    }
+    escreveClientes("Clientes.txt");
+    escreveContas("Contas.txt");
+    escreveTransacoes("Transacoes.txt");
 }
+
+/* -- CLIENTES -- */
 
 // Essa função pede os dados do cliente cria um CLIENTE com esses dados e retorna esse cliente
 CLIENTE cadastraCliente()
 {
-    char codigo[15] = "1234";
+    CLIENTE C;
 
-    char nome[100];
+    if(clientes_registrados >= 100)
+    {
+        printf("Numero maximo de clientes atingido\n");
+        return C;
+    }
+
+    char nome[nome_size];
     printf("Nome: ");
     fgets(nome, sizeof(nome), stdin);
+    nome[strcspn(nome, "\n")] = 0;
 
-    char CPF_CNPJ[20];
+    char CPF_CNPJ[CPF_CNPJ_size];
     printf("CPF/CNPJ: ");
     fgets(CPF_CNPJ, sizeof(CPF_CNPJ), stdin);
+    CPF_CNPJ[strcspn(CPF_CNPJ, "\n")] = 0;
 
-    char telefone[20];
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        if(!strcmp(CPF_CNPJ, cliente[i].CPF_CNPJ))
+        {
+            printf("Cliente já cadastrado\n");
+            return C;
+        }
+    }
+
+    char codigo[codigo_size];
+    printf("Codigo: ");
+    fgets(codigo, sizeof(codigo), stdin); 
+    codigo[strcspn(codigo, "\n")] = 0;
+
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+
+        if(!strcmp(codigo, cliente[i].codigo))
+        {
+            printf("Cliente já cadastrado\n");
+            return C;
+        }
+    }
+
+    char telefone[telefone_size];
     printf("Telefone: ");
     fgets(telefone, sizeof(telefone), stdin);
+    telefone[strcspn(telefone, "\n")] = 0;
 
-    char endereco[100];
+    char endereco[endereco_size];
     printf("Endereço: ");
     fgets(endereco, sizeof(endereco), stdin);
-
-    CLIENTE C;
+    endereco[strcspn(endereco, "\n")] = 0;
 
     strcpy(C.codigo, codigo);
     strcpy(C.nome, nome);
     strcpy(C.CPF_CNPJ, CPF_CNPJ);
     strcpy(C.telefone, telefone);
     strcpy(C.endereco, endereco);
+    C.contas_registradas = 0;
 
+    C.conta[0].codConta = 0;
+    C.conta[1].codConta = 0;
+
+    clientes_registrados++;
+    printf("\nCliente Cadastrado\n\n");
     return C;
 }
 
-// TODO!:
-int verificaCodigos()
+// Essa função organiza os elementos do array de cliente por ordem alfabética, usando um bubble sort
+void organizaClientes()
 {
-    for (int i = 0; i < 100; i++)
+    CLIENTE temp;
+    bool trocou = true;
+
+    while(trocou)
     {
-        for (int j = 0; j < 100; j++)
+        trocou = false;
+        for(int i = 0; i < clientes_registrados - 1; i++)
         {
-            if (!strcmp(cliente[i].codigo, cliente[j].codigo))
+            if(strcmp(cliente[i+1].nome, cliente[i].nome) < 0)
             {
-                return 0;
+                temp = cliente[i];
+                cliente[i] = cliente[i+1];
+                cliente[i+1] = temp;
+                trocou = true;
             }
         }
     }
 }
 
-// !TODO
-void organizaClientes(CLIENTE C[])
-{
-    return;
-}
-
 // Essa função lista todos os clientes cadastrados
 void listaClientes()
 {
-    // TODO
-    //organizaClientes(cliente);
+    organizaClientes();
+
+    if(clientes_registrados <= 0)
+    {
+        printf("Nenhum cliente cadastrado\n");
+        return;
+    }
+
     for (int i = 0; i < clientes_registrados; i++)
     {
-        // Valores obtidos com o fgets() ficam com o ENTER final
-        printf("----- CLIENTE %d -----\n"
-               "Nome: %s"
-               "CPF/CNPJ: %s"
-               "Codigo: %s\n"
-               "Telefone: %s"
-               "Endereço: %s"
-               "---------------------\n",
-               i + 1, cliente[i].nome, cliente[i].CPF_CNPJ, cliente[i].codigo, cliente[i].telefone, cliente[i].endereco);
+        printf("----- CLIENTE %d -----\n", i+1);
+        imprimeCliente(cliente[i]);
     }
 }
 
@@ -279,12 +432,13 @@ int atualizaCliente(int indice)
     char escolha = '0';
     printf("São esses o nome e CPF/CNPJ do cliente que vc deseja atualizar?(S/N)\n"
            " - %s"
-           " - %s",
+           " - %s\n"
+           "->",
            cliente[indice].nome, cliente[indice].CPF_CNPJ);
     while (escolha != 'N' && escolha != 'S')
     {
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         switch (escolha)
         {
@@ -297,7 +451,6 @@ int atualizaCliente(int indice)
             break;
         }
     }
-    //TODO: lembrar de colocar alguma verificação se o cliente realmente foi cadastrado
 }
 
 // Essa função recebe o índice do cliente que deve ser excluído
@@ -310,12 +463,13 @@ int atualizaCliente(int indice)
 int excluiCliente(int indice)
 {
     char escolha = '0';
-    printf("Esse é o cliente a ser excluído?(S/N)\n");
+    printf("Esse é o cliente a ser excluído?(S/N)\n ");
     imprimeCliente(cliente[indice]);
     while (escolha != 'S')
     {
+        printf("-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha == 'N')
             return 0;
@@ -324,7 +478,7 @@ int excluiCliente(int indice)
     {
         cliente[i] = cliente[i+1];
     }
-    // - Essa parte não é necessária pois o número de clientes registrados deve ser redizido logo após o uso dessa função
+    // - Essa parte não é necessária pois o número de clientes registrados deve ser reduzido logo após o uso dessa função
     // Para remover o último cliente do array, um cliente vazio auxiliar é criado e o ultimo cliente recebe o valor dele
     //CLIENTE aux; 
     //cliente[clientes_registrados - 1] = aux;
@@ -335,14 +489,16 @@ int excluiCliente(int indice)
 void imprimeCliente(CLIENTE C)
 {
     printf("----------------------\n"
-           "Nome: %s"
-           "CPF/CNPJ: %s"
+           "Nome: %s\n"
+           "CPF/CNPJ: %s\n"
            "Codigo: %s\n"
-           "Telefone: %s"
-           "Endereço: %s"
+           "Telefone: %s\n"
+           "Endereço: %s\n"
            "---------------------\n",
            C.nome, C.CPF_CNPJ, C.codigo, C.telefone, C.endereco);
 }
+
+/* -- MENUS -- */
 
 // Imprime o Menu "Bem Vindo"
 char imprimeBemVindo()
@@ -356,7 +512,7 @@ char imprimeBemVindo()
                "T - Gerenciar Contas\n"
                "S - Sair\n-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'C' && escolha != 'T' && escolha != 'S')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -381,7 +537,7 @@ char imprimeGerenciarClientes()
                "S - Sair\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'C' && escolha != 'L' && escolha != 'B' && escolha != 'A' && escolha != 'E' && escolha != 'S')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -403,7 +559,7 @@ char imprimeMenuBusca()
                "D - CPF/CNPJ\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'N' && escolha != 'C' && escolha != 'D')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -424,7 +580,7 @@ char imprimeMenuEscolhaCodOuCPF_CNPJ()
                "D - CPF/CNPJ\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'C' && escolha != 'D')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -455,7 +611,7 @@ char imprimeGerenciarContas()
                "S - Sair\n"
                "-> ");
         scanf("%c", &escolha);
-        getchar();
+        while(getchar() != '\n');
         escolha = paraMaiuscula(escolha);
         if (escolha != 'R' && escolha != 'C' && escolha != 'L' && escolha != 'W' && escolha != 'D' && escolha != 'T' && escolha != 'E' && escolha != 'S')
             printf("\nPor favor escolha uma das opções\n\n");
@@ -473,18 +629,6 @@ char paraMaiuscula(char c)
     return c;
 }
 
-//TODO:
-void carregaClientes()
-{
-    int i = 0;
-    while (cliente[i].nome[0] != 0)
-    {
-        i++;
-    }
-    clientes_registrados = i;
-}
-
-
 /* -- CONTAS -- */
 
 void cadastraConta()
@@ -495,11 +639,11 @@ void cadastraConta()
     int aux = 0;
     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
     scanf("%s", &string);
-    getchar();
+    while(getchar() != '\n');
     indexCliente = buscaClientes(escolha, string);
     if(indexCliente == -1)
     {
-        printf("Cliente não existente");
+        printf("Cliente não existente\n");
         return;
     }
     
@@ -516,31 +660,53 @@ void cadastraConta()
         return;
     }
 
-    //TODO: deletar depois
-    printf("Cadastrando na 'conta[%d]'\n", aux);
+    printf("Cadastrando na 'conta[%d]' do cliente %s\n", aux, cliente[indexCliente].nome);
+
     printf("Insira a agência: ");
     scanf("%d", &cliente[indexCliente].conta[aux].agencia);
     while(getchar() != '\n');
-
-    //cliente[indexCliente].conta[aux].agencia = 20;
 
     printf("Insira o número da conta: ");
     scanf("%d", &cliente[indexCliente].conta[aux].numeroConta);
     while(getchar() != '\n');
 
-    //cliente[indexCliente].conta[aux].numeroConta = 200;
-
-    cliente[indexCliente].conta[aux].codConta = (cliente[indexCliente].conta[aux].agencia * 1000) + cliente[indexCliente].conta[aux].codConta;
+    cliente[indexCliente].conta[aux].codConta = (cliente[indexCliente].conta[aux].agencia * 1000) + cliente[indexCliente].conta[aux].numeroConta;
 
     cliente[indexCliente].conta[aux].saldo = 0;
 
     cliente[indexCliente].contas_registradas++;
-    printf("Conta cadastrada");
+    printf("Conta cadastrada\n");
+}
+
+// Essa função organiza as contas por odem alfabética
+void organizaContas(CLIENTE *C)
+{
+    CONTA temp;
+    bool trocou = true;
+
+    while(trocou)
+    {
+        trocou = false;
+        for(int j = 1; j < C->contas_registradas; j++)
+        {
+            if(C->conta[j].saldo > C->conta[j-1].saldo)
+            {
+                temp = C->conta[j];
+                C->conta[j] = C->conta[j-1];
+                C->conta[j-1] = temp;
+                trocou = true; 
+            }
+        }
+    }
 }
 
 // Lista todas as contas
 void listaTodasContas()
 {
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        organizaContas(&cliente[i]);
+    }
     for(int i = 0; i < clientes_registrados; i++)
     {
         imprimeContas(cliente[i]);
@@ -550,17 +716,31 @@ void listaTodasContas()
 // Recebe um cliente e imprime as contas desse cliente
 void imprimeContas(CLIENTE C)
 {
-    imprimeCliente(C);
+    if(C.contas_registradas == 0)
+    {
+        printf("Nenhuma conta cadastrada\n");
+        printf("---------------------------\n");
+        return;
+    }
+        imprimeCliente(C);
     for(int i = 0; i < C.contas_registradas; i++)
     {
-        printf("Agencia: %d\n", C.conta[i].agencia);
-        printf("Numero da conta: %d\n", C.conta[i].numeroConta);
-        printf("Codigo da conta: %d\n", C.conta[i].codConta);
-        printf("Saldo: %lf\n", C.conta[i].saldo);
-        printf("------------------------\n");
+        imprimeUmaConta(C.conta[i]);
     }
 }
 
+// Imprime uma conta específica
+void imprimeUmaConta(CONTA CNT)
+{
+    printf("Agencia: %d\n", CNT.agencia);
+    printf("Numero da conta: %d\n", CNT.numeroConta);
+    printf("Codigo da conta: %d\n", CNT.codConta);
+    printf("Saldo: %.2lf\n", CNT.saldo);
+    printf("-------------------------------\n");
+}
+
+// Essa função recebe a agencia e o numeroConta de uma conta e modifica os dois ponteiros indexCliente e indexConta de onde essa conta foi encontrada
+// Caso nehuma conta seja encontrada o index do cliente é modificado para -1 
 void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta)
 {
     for(int i = 0; i < clientes_registrados; i++)
@@ -578,47 +758,376 @@ void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta
     *indexCliente = -1;
 }
 
-CONTA realizarSaque(CONTA conta)
+// Essa função checa se um númeor é inteiro
+bool eInteiro(double n)
 {
-    double valor;
-    printf("Conta: %i/%i\n", conta.agencia, conta.numeroConta);
-    printf("Saldo atual: %lf\n", conta.saldo);
-    printf("\nInsira o valor a ser sacado:");
-    scanf("%lf", &valor);
-    while(getchar() != '\n');
-
-    if(valor <= 0 || conta.saldo < valor)
-    {
-        printf("Valor inválido ou saldo insuficiente\n");
-        return conta;
-    }
-
-    conta.saldo -= valor;
-    printf("Saque realizado\n");
-    printf("Saldo final: %lf\n", conta.saldo);
-
-    return conta;
+    int truncado = (int)n;
+    return(n == truncado);
 }
 
-CONTA realizaDeposito(CONTA conta)
+void realizarSaque(CONTA *conta, double valor)
+{
+    if(valor <= 0)
+    {
+        printf("Valor inválido\nValores nulos ou negativos não são permitidos\n");
+        return;
+    }
+    if(conta->saldo < valor)
+    {
+        printf("Saldo insuficiente\n");
+        return;
+    }
+    if(!eInteiro(valor))
+    {
+        printf("Valor inválido\nSó são aceitos valores inteiros\n");
+        return;
+    }
+
+    int notas = (int)valor;
+
+    int aux = notas;
+
+    aux = notas;
+    aux = (aux % 200);
+    aux = (aux % 100);
+    aux = (aux % 50);
+    aux = (aux % 20);
+    aux = (aux % 10);
+    aux = (aux % 5);
+    aux = (aux % 2);
+
+    if(aux > 0)
+    {
+        printf("Valor inválido\nSó são aceitos valores que podem ser distribuídos entre as seguintes notas: R$ 200,00, R$ 100,00, R$ 50,00, R$ 20,00, R$ 10,00, R$ 5,00, R$ 2,00.\n");
+        return;
+    }
+
+    conta->saldo -= valor;
+    char descricao[descricao_size];
+    printf("Insira uma descrição para a sua transacao: ");
+    fgets(descricao, sizeof(descricao), stdin);
+    descricao[strcspn(descricao, "\n")] = 0;
+    criaTransacao(conta->codConta, 'D', valor, descricao);
+
+    printf("Saque realizado\nForam entregues: \n");
+
+    aux = notas;
+
+    if(aux / 200 != 0)
+        printf("%d nota(s) de R$ 200,00\n", aux / 200);
+    aux = (aux % 200);
+
+    if(aux / 100 != 0)
+        printf("%d nota(s) de R$ 100,00\n", aux / 100);
+    aux = (aux % 100);
+
+    if(aux / 50 != 0)
+        printf("%d nota(s) de R$ 50,00\n", aux / 50);
+    aux = (aux % 50);
+
+    if(aux / 20 != 0)
+        printf("%d nota(s) de R$ 20,00\n", aux / 20);
+    aux = (aux % 20);
+
+    if(aux / 10 != 0)
+        printf("%d nota(s) de R$ 10,00\n", aux / 10);
+    aux = (aux % 10);
+
+    if(aux / 5 != 0)
+        printf("%d nota(s) de R$ 5,00\n", aux / 5);
+    aux = (aux % 5);
+
+    if(aux / 2 != 0)
+        printf("%d nota(s) de R$ 2,00\n", aux / 2);
+
+    
+    printf("Saldo final: %.2lf\n", conta->saldo);
+
+}
+
+void realizaDeposito(CONTA *conta, double valor)
+{
+    if(valor <= 0)
+    {
+        printf("Valor inválido\n");
+        return;
+    }
+
+    conta->saldo += valor;
+    char descricao[descricao_size];
+    printf("Insira uma descrição para a sua transacao: ");
+    fgets(descricao, sizeof(descricao), stdin);
+    descricao[strcspn(descricao, "\n")] = 0;
+    criaTransacao(conta->codConta, 'C', valor, descricao);
+    printf("Depósito realizado\n");
+    printf("Saldo final: %.2lf\n", conta->saldo);
+}
+
+void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino)
 {
     double valor;
-    printf("Conta: %d-%d\n", conta.agencia, conta.numeroConta);
-    printf("Saldo atual: %lf\n", conta.saldo);
-    printf("\nInsira o valor a ser depositado: ");
+    printf("Realizando Transferencia da Conta %d-%d para a conta %d-%d\n", contaOrigem->agencia, contaOrigem->numeroConta, contaDestino->agencia, contaDestino->numeroConta);
+    printf("Insira o valor a ser transferido: ");
     scanf("%lf", &valor);
     while(getchar() != '\n');
 
     if(valor <= 0)
     {
-        printf("Valor inválido\n");
-        return conta;
+        printf("O valor a ser transferido não pode ser nulo ou negativo\n");
+        return;
+    } else if(valor > contaOrigem->saldo)
+    {
+        printf("A conta de origem não tem fundos o suficiente\n");
+        return;
     }
 
-    conta.saldo += valor;
-    printf("Depósito realizado\n");
-    printf("Saldo final: %lf\n", conta.saldo);
+    char desc[34];
 
-    return conta;
+    contaOrigem->saldo -= valor;
+    snprintf(desc, sizeof(desc), "Transferência para conta: %d-%d", contaDestino->agencia, contaDestino->numeroConta);
+    criaTransacao(contaOrigem->codConta, 'D', valor, desc);
+
+    contaDestino->saldo += valor;
+    snprintf(desc, sizeof(desc), "Transferência de conta: %d-%d", contaOrigem->agencia, contaOrigem->numeroConta);
+    criaTransacao(contaDestino->codConta, 'C', valor, desc);
+
+    printf("Transferencia realizada\n");
 }
 
+void criaTransacao(int codConta, char operacao, double valor, char descricao[])
+{
+    if(transacoes_realizadas == 0)
+    {
+        transacao = (TRANSACAO *) malloc(sizeof(TRANSACAO));
+    } else
+    {
+        transacao = (TRANSACAO *) realloc(transacao, sizeof(TRANSACAO) * (transacoes_realizadas + 1));
+    }
+
+    if(transacao == NULL)
+    {
+        printf("Falha de alocação de memória para transacao\n");
+        return;
+    }
+
+    strcpy(transacao[transacoes_realizadas].descricao, descricao);
+
+    if(operacao == 'C')
+    {
+        transacao[transacoes_realizadas].credito = true;
+        transacao[transacoes_realizadas].debito = false;
+    } else 
+    {
+        transacao[transacoes_realizadas].credito = false;
+        transacao[transacoes_realizadas].debito = true;
+    }
+
+    transacao[transacoes_realizadas].codConta = codConta;
+    transacao[transacoes_realizadas].valor = valor;
+
+    time_t agora;
+    agora = time(NULL);
+    transacao[transacoes_realizadas].data = localtime(&agora);
+    transacoes_realizadas++;
+}
+
+void imprimeTransacao(TRANSACAO T)
+{
+    if(T.credito)
+    {
+        printf("Tipo de operacao: CREDITO\n");
+    } else
+    {
+        printf("Tipo de operacao: DEBITO\n");
+    }
+    printf("Descricao: %s\n", T.descricao);
+    printf("Valor: %.2lf\n", T.valor);
+    printf("Data: %d/%d/%d\n", T.data->tm_mday, T.data->tm_mon + 1, T.data->tm_year + 1900);
+}
+
+void exibeExtrato(int codigo)
+{
+    int qtdDias = 0;
+    printf("Insira a quantidade de dias: ");
+    scanf("%d", &qtdDias);
+    while(getchar() != '\n');
+    time_t agora;
+    agora = time(NULL);
+    struct tm* hoje;
+    hoje = localtime(&agora);
+    for(int i = 0; i < transacoes_realizadas; i++)
+    {
+        if(transacao[i].codConta == codigo && transacao[i].data->tm_yday > hoje->tm_yday - qtdDias)
+        {
+            imprimeTransacao(transacao[i]);
+        }
+    }
+}
+
+/* -- ARQUIVOS -- */
+
+void leClientes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "r");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um errro durante a abertura do arquivo para leitura ou o arquivo não existe\n");
+        return;
+    }
+
+    char buffer[250];
+    fgets(buffer, 250, fp);
+
+    int i = 0;
+    while(!feof(fp))
+    {
+        CLIENTE *c = cliente + i;
+        sscanf(buffer, FORMATO_ENTRADA_CLIENTES, c->codigo, c->nome, c->CPF_CNPJ, c->telefone, c->endereco, &c->contas_registradas, &c->conta[0].codConta, &c->conta[1].codConta);
+        clientes_registrados++;
+        i++;
+        fgets(buffer, 250, fp);
+    }
+
+    fclose(fp);
+}
+
+void escreveClientes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "w");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um erro durante a abertura do arquivo para gravação\n");
+        return;
+    }
+
+    for(int index = 0; index < clientes_registrados; index++)
+    {
+        fprintf(fp, FORMATO_SAIDA_CLIENTES, cliente[index].codigo, cliente[index].nome, cliente[index].CPF_CNPJ, cliente[index].telefone, cliente[index].endereco, cliente[index].contas_registradas, cliente[index].conta[0].codConta, cliente[index].conta[1].codConta);
+    }
+
+    fclose(fp);
+}
+
+void leContas(char arquivo[])
+{   
+    FILE *fp;
+    fp = fopen(arquivo, "r");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um errro durante a abertura do arquivo para leitura ou o arquivo não existe\n");
+        return;
+    }
+
+    char buffer[100];
+    fgets(buffer, 100, fp);
+
+
+    while(!feof(fp))
+    {
+        CONTA c;
+        sscanf(buffer, FORMATO_ENTRADA_CONTAS, &c.codConta, &c.agencia, &c.numeroConta, &c.saldo);
+        for(int i = 0; i < clientes_registrados; i++)
+        {
+            for(int j = 0; j < cliente[i].contas_registradas; j++)
+            {
+                if(cliente[i].conta[j].codConta == c.codConta)
+                {
+                    cliente[i].conta[j] = c;
+                }
+            }
+        }
+        fgets(buffer, 100, fp);
+    }
+    
+    fclose(fp);
+}
+
+void escreveContas(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "w");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um erro durante a abertura do arquivo");
+        return;
+    }
+
+    for(int i = 0; i < clientes_registrados; i++)
+    {
+        for(int j = 0; j < cliente[i].contas_registradas; j++)
+        {
+            fprintf(fp, FORMATO_SAIDA_CONTAS, cliente[i].conta[j].codConta, cliente[i].conta[j].agencia, cliente[i].conta[j].numeroConta, cliente[i].conta[j].saldo);
+        }
+    }
+     
+    fclose(fp);
+}
+
+// Eu não consegui implementar a função para ler as transações do arquivo
+// no momento ela causa Falha de segmentação
+void leTransacoes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "r");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um errro durante a abertura do arquivo para leitura ou o arquivo não existe\n");
+        return;
+    }
+
+    char buffer[250];
+    fgets(buffer, 250, fp);
+
+    printf("aqui\n");
+    int i = 0;
+    while(!feof(fp))
+    {
+        TRANSACAO *t = transacao + i;
+        printf("aqui12\n");
+
+        if(transacoes_realizadas == 0)
+        {
+            transacao = (TRANSACAO *) malloc(sizeof(TRANSACAO));
+            printf("aqui13\n");
+        } else
+        {
+            transacao = (TRANSACAO *) realloc(transacao, sizeof(TRANSACAO) * (transacoes_realizadas + 1));
+            printf("aqui15\n");
+        }
+
+        if(transacao == NULL)
+        {
+            printf("Falha de alocação de memória para transacao\n");
+            return;
+        }
+
+        printf("aqui17\n");
+        sscanf(buffer, FORMATO_ENTRADA_TRANSACOES, &t->codConta, &t->debito, &t->credito, &t->valor, &t->data->tm_mday, &t->data->tm_mon, &t->data->tm_year, t->descricao);
+        printf("aqui\n");
+        transacoes_realizadas++;
+        i++;
+        fgets(buffer, 250, fp);
+    }
+    
+    fclose(fp);
+}
+
+void escreveTransacoes(char arquivo[])
+{
+    FILE *fp;
+    fp = fopen(arquivo, "w");
+    if(fp == NULL)
+    {
+        printf("Ocorreu um erro durante a abertura do arquivo para gravação\n");
+        return;
+    }
+
+    for(int index = 0; index < transacoes_realizadas; index++)
+    {
+        fprintf(fp, FORMATO_SAIDA_TRANSACOES, transacao[index].codConta, transacao[index].debito, transacao[index].credito, transacao[index].valor, transacao[index].data->tm_mday, transacao[index].data->tm_mon, transacao[index].data->tm_year, transacao[index].descricao);
+    }
+
+    fclose(fp);
+}
