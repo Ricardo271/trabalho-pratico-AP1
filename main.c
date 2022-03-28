@@ -2,10 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "clientes.h"
-#include "menus.h"
-#include "contas.h"
-#include "transacoes.h"
+#include <stdbool.h>
+#include <time.h>
+
 
 #define clear printf("\e[1;1H\e[2J"); // "Limpa" o terminal
 
@@ -23,7 +22,6 @@ const char *FORMATO_SAIDA_TRANSACOES   = "{\"cod\": \"%d\", \"debito\": \"%d\", 
 
 
 /* -- Prototipos -- */
-
 bool eInteiro(double n);
 void leClientes(char arquivo[]);
 void escreveClientes(char arquivo[]);
@@ -31,6 +29,82 @@ void leContas(char arquivo[]);
 void escreveContas(char arquivo[]);
 void leTransacoes(char arquivo[]);
 void escreveTransacoes(char arquivo[]);
+
+
+/* -- Contas -- */
+typedef struct _CONTA
+{
+    int agencia;
+    int numeroConta;
+    int codConta; // O código é a agencia concatenada com o número da conta
+    double saldo;
+} CONTA;
+
+void cadastraConta();
+void listaTodasContas();
+void imprimeContas();
+void imprimeUmaConta();
+void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta);
+void realizarSaque(CONTA *conta, double valor);
+void realizaDeposito(CONTA *conta, double valor);
+void realizaTransferencia(CONTA *contaOrigem, CONTA *contaDestino);
+
+
+/* -- Clientes -- */
+#define codigo_size 6
+#define nome_size 101
+#define CPF_CNPJ_size 16 // CPF 123456789xx(11) & CNPJ XX.XXX.XXX/XXXX.XX(14)
+#define telefone_size 16 // +5562912341234(14)
+#define endereco_size 101
+
+typedef struct _CLIENTE
+{
+    char codigo[codigo_size];
+    char nome[nome_size];
+    char CPF_CNPJ[CPF_CNPJ_size];
+    char telefone[telefone_size]; // +55 62 91234-1234
+    char endereco[endereco_size];
+    int contas_registradas;
+    CONTA conta[2];
+} CLIENTE;
+
+CLIENTE cadastraCliente();
+void organizaClientes();
+void listaClientes();
+int buscaClientes(char opcao, char string[]);
+int atualizaCliente(int indice);
+int excluiCliente(int indice);
+void imprimeCliente();
+
+
+/* -- Menus -- */
+char imprimeBemVindo();
+char imprimeGerenciarClientes();
+char imprimeGerenciarContas();
+char imprimeMenuBusca();
+char imprimeMenuEscolhaCodOuCPF_CNPJ();
+char paraMaiuscula(char c);
+
+
+/* -- Transacoes -- */
+#define descricao_size 101
+
+typedef struct tm tm;
+
+typedef struct _TRANSACAO
+{
+    int codConta;
+    bool debito;
+    bool credito;
+    double valor;
+    tm *data;
+    char descricao[descricao_size];
+} TRANSACAO;
+
+void criaTransacao(int codConta, char operacao, double valor, char descrico[]);
+void imprimeTransacao(TRANSACAO T);
+void exibeExtrato(int codigo);
+
 
 CLIENTE cliente[SIZE];
 int clientes_registrados = 0;
