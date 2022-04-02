@@ -116,7 +116,6 @@ int main()
 {
     leClientes("Clientes.txt");
     leContas("Contas.txt");
-    //leTransacoes("Transacoes.txt");
 
     char escolha = imprimeBemVindo();
     while (escolha != 'S')
@@ -139,7 +138,7 @@ int main()
                     escolha = imprimeMenuBusca();
                     printf("Insira o Termo de busca: ");
                     char string[100];
-                    scanf("%s", &string);
+                    scanf("%s", string);
                     while(getchar() != '\n');
                     int aux = buscaClientes(escolha, string);
                     if (aux == -1)
@@ -151,7 +150,7 @@ int main()
                 {
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
-                    scanf("%s", &string);
+                    scanf("%s", string);
                     while(getchar() != '\n');
                     int aux = atualizaCliente(buscaClientes(escolha, string));
                     if (aux == 1)
@@ -165,7 +164,7 @@ int main()
                 {
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
-                    scanf("%s", &string);
+                    scanf("%s", string);
                     while(getchar() != '\n');
                     int aux = excluiCliente(buscaClientes(escolha, string));
                     if (aux == 0)
@@ -197,7 +196,7 @@ int main()
                 {
                     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
                     char string[15];
-                    scanf("%s", &string);
+                    scanf("%s", string);
                     while(getchar() != '\n');
                     int aux;
                     aux = buscaClientes(escolha, string);
@@ -288,7 +287,6 @@ int main()
                         imprimeCliente(cliente[indexClienteOrigem]);
                         printf("Conta: %i-%i\n", cliente[indexClienteOrigem].conta[indexContaOrigem].agencia, cliente[indexClienteOrigem].conta[indexContaOrigem].numeroConta);
                         printf("Saldo atual: %.2lf\n", cliente[indexClienteOrigem].conta[indexContaOrigem].saldo);
-                        // imprimeUmaConta(cliente[indexClienteOrigem].conta[indexContaOrigem]);
 
                         printf(" Conta Destino \n");
                         printf("Insira a agencia: ");
@@ -307,7 +305,6 @@ int main()
                             imprimeCliente(cliente[indexClienteDestino]);
                             printf("Conta: %i-%i\n", cliente[indexClienteDestino].conta[indexContaDestino].agencia, cliente[indexClienteDestino].conta[indexContaDestino].numeroConta);
                             printf("Saldo atual: %.2lf\n", cliente[indexClienteDestino].conta[indexContaDestino].saldo);
-                            // imprimeUmaConta(cliente[indexClienteDestino].conta[indexContaDestino]);
 
                             realizaTransferencia(&cliente[indexClienteOrigem].conta[indexContaOrigem], &cliente[indexClienteDestino].conta[indexContaDestino]);
                         }
@@ -552,10 +549,6 @@ int excluiCliente(int indice)
     {
         cliente[i] = cliente[i+1];
     }
-    // - Essa parte não é necessária pois o número de clientes registrados deve ser reduzido logo após o uso dessa função
-    // Para remover o último cliente do array, um cliente vazio auxiliar é criado e o ultimo cliente recebe o valor dele
-    //CLIENTE aux; 
-    //cliente[clientes_registrados - 1] = aux;
     return 1;
 }
 
@@ -628,8 +621,8 @@ char imprimeMenuBusca()
     {
         printf("==================================================\n"
                "Deseja realizar a busca por:\n"
-               "N – Nome\n"
-               "C – Codigo\n"
+               "N - Nome\n"
+               "C - Codigo\n"
                "D - CPF/CNPJ\n"
                "-> ");
         scanf("%c", &escolha);
@@ -650,7 +643,7 @@ char imprimeMenuEscolhaCodOuCPF_CNPJ()
     {
         printf("==================================================\n"
                "Deseja buscar o cliente por Codigo ou CPF/CNPJ :\n"
-               "C – Codigo\n"
+               "C - Codigo\n"
                "D - CPF/CNPJ\n"
                "-> ");
         scanf("%c", &escolha);
@@ -675,13 +668,13 @@ char imprimeGerenciarContas()
     {
         printf("=============== Gerenciar Contas =================\n"
                "Digite um comando para prosseguir:\n"
-               "R – Listagem de todas as contas cadastradas\n"
-               "C – Cadastrar uma conta para um cliente\n"
-               "L – Listar todas as contas de um cliente\n"
-               "W – Realizar um saque em uma conta\n"
-               "D – Realizar um depósito em uma conta\n"
-               "T – Realizar transferência entre contas\n"
-               "E – Exibir extrato de uma conta\n"
+               "R - Listagem de todas as contas cadastradas\n"
+               "C - Cadastrar uma conta para um cliente\n"
+               "L - Listar todas as contas de um cliente\n"
+               "W - Realizar um saque em uma conta\n"
+               "D - Realizar um depósito em uma conta\n"
+               "T - Realizar transferência entre contas\n"
+               "E - Exibir extrato de uma conta\n"
                "S - Sair\n"
                "-> ");
         scanf("%c", &escolha);
@@ -712,7 +705,7 @@ void cadastraConta()
     int indexCliente;
     int aux = 0;
     escolha = imprimeMenuEscolhaCodOuCPF_CNPJ();
-    scanf("%s", &string);
+    scanf("%s", string);
     while(getchar() != '\n');
     indexCliente = buscaClientes(escolha, string);
     if(indexCliente == -1)
@@ -752,7 +745,7 @@ void cadastraConta()
     printf("Conta cadastrada\n");
 }
 
-// Essa função organiza as contas por odem alfabética
+// Essa função organiza as contas
 void organizaContas(CLIENTE *C)
 {
     CONTA temp;
@@ -832,7 +825,7 @@ void buscaConta(int agencia, int numeroConta, int *indexCliente, int *indexConta
     *indexCliente = -1;
 }
 
-// Essa função checa se um númeor é inteiro
+// Essa função checa se um número é inteiro
 bool eInteiro(double n)
 {
     int truncado = (int)n;
@@ -1139,8 +1132,6 @@ void escreveContas(char arquivo[])
     fclose(fp);
 }
 
-// Eu não consegui implementar a função para ler as transações do arquivo
-// no momento ela causa Falha de segmentação
 void leTransacoes(char arquivo[])
 {
     FILE *fp;
